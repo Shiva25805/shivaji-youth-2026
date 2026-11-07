@@ -1,0 +1,1007 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Dashboard | Shivaji Youth 2026</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .member-welcome {
+            background: linear-gradient(135deg, #101b32, #304c75);
+            color: white;
+            padding: 28px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+        }
+
+        .member-welcome h2 {
+            margin-bottom: 8px;
+        }
+
+        .member-welcome p {
+            color: #d9e3f3;
+            font-size: 14px;
+        }
+
+        .member-profile {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 22px;
+        }
+
+        .member-avatar {
+            width: 62px;
+            height: 62px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #e99519;
+            color: #172033;
+            font-size: 27px;
+            font-weight: bold;
+        }
+
+        .member-info h3 {
+            margin-bottom: 5px;
+        }
+
+        .member-info p {
+            margin-top: 4px;
+            overflow-wrap: anywhere;
+        }
+
+        .member-summary {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .member-stat {
+            background: white;
+            border: 1px solid #e5e9f1;
+            border-radius: 13px;
+            padding: 22px;
+        }
+
+        .member-stat span {
+            color: #68758a;
+            font-size: 14px;
+        }
+
+        .member-stat h2 {
+            font-size: 24px;
+            margin-top: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .member-panel {
+            background: white;
+            border: 1px solid #e5e9f1;
+            border-radius: 13px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .member-panel h2 {
+            margin-bottom: 16px;
+        }
+
+        .member-table-wrap {
+            overflow-x: auto;
+        }
+
+        .member-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .member-table th, .member-table td {
+            padding: 13px 10px;
+            border-bottom: 1px solid #edf0f5;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .member-table th {
+            background: #f7f8fc;
+            color: #58657a;
+        }
+
+        .member-empty {
+            padding: 28px !important;
+            text-align: center;
+            color: #758096;
+            white-space: normal !important;
+        }
+
+        .member-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .member-actions a, .member-actions button {
+            display: inline-block;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 16px;
+            background: #fff0d9;
+            color: #7b4a00;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .member-message {
+            color: #68758a;
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        @media(max-width: 800px) {
+            .member-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .member-panel {
+                padding: 16px;
+            }
+
+            .member-welcome {
+                padding: 22px;
+            }
+        }
+
+        @media print {
+            .sidebar, .no-print, .dashboard-footer {
+                display: none !important;
+            }
+
+            .dashboard-main {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            body {
+                background: white !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="dashboard-body">
+
+    <aside class="sidebar">
+        <h2>🟠 Shivaji Youth</h2>
+        <p class="sidebar-subtitle">2026 Member Portal</p>
+
+        <nav class="side-nav">
+            <a href="member-dashboard.html" class="active">My Dashboard</a>
+            <a href="profile.html">My Profile</a>
+            <a href="member-history.html">Contribution History</a>
+            <a href="receipts.html">Receipt Page</a>
+        </nav>
+
+        <a href="user-login.html" class="logout-link">Back to Member Login</a>
+    </aside>
+
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <div>
+                <h1>Member Dashboard</h1>
+                <p>Your profile and recorded contribution summary.</p>
+            </div>
+            <span class="admin-badge">Member Portal</span>
+            <button type="button" id="memberLogoutBtn" class="primary-btn">
+                Logout
+            </button>
+        </header>
+    
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+            <h2>📢 Latest Announcements</h2>
+            <p>Important updates from Chatrapathi Shivaji Youth 2026.</p>
+            </div>
+
+            <div id="memberAnnouncements">
+            <p class="empty-state">Loading announcements...</p>
+            </div>
+            </section>
+
+        <section class="member-welcome">
+            <h2>Welcome, <span id="welcomeName">Member</span>!</h2>
+            <p>View your profile and the payment records associated with your details.</p>
+        
+        <section class="summary-grid">
+
+        <div class="summary-card">
+        <span>Chanda Contributed</span>
+        <h2 id="memberChandaTotal">₹0</h2>
+        <p>Your recorded chanda contributions</p>
+         </div>
+
+    <div class="summary-card">
+        <span>Auction Payments</span>
+        <h2 id="memberAuctionTotal">₹0</h2>
+        <p>Your recorded auction payments</p>
+    </div>
+
+    <div class="summary-card">
+        <span>Other Payments</span>
+        <h2 id="memberPaymentTotal">₹0</h2>
+        <p>Your recorded payments</p>
+    </div>
+
+    <div class="summary-card balance-card">
+        <span>Total Recorded Contribution</span>
+        <h2 id="memberContributionTotal">₹0</h2>
+        <p>Based on matching records</p>
+    </div>
+
+</section>
+
+            <div class="member-profile">
+                <div class="member-avatar" id="memberAvatar">M</div>
+                <div class="member-info">
+                    <h3 id="profileNameDisplay">Member Name</h3>
+                    <p id="profileEmailDisplay">Email not available</p>
+                    <p id="profilePhoneDisplay">Phone not available</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="member-actions no-print">
+            <a href="profile.html">Edit Profile</a>
+            <button type="button" id="refreshButton">Refresh Summary</button>
+            <button type="button" id="printButton">Print Summary</button>
+        </div>
+
+        <section class="member-summary">
+            <article class="member-stat">
+                <span>Total Chanda Contributions</span>
+                <h2 id="memberChanda">₹0</h2>
+            </article>
+
+            <article class="member-stat">
+                <span>Auction Payments Received</span>
+                <h2 id="memberAuction">₹0</h2>
+            </article>
+
+            <article class="member-stat">
+                <span>Event Advances Recorded</span>
+                <h2 id="memberEvents">₹0</h2>
+            </article>
+        </section>
+
+        <section class="member-panel">
+            <h2>My Payment History</h2>
+            <p class="member-message" id="memberMessage" role="status">
+                Showing records matching this member's saved contact details.
+            </p>
+            
+<section class="dashboard-panel">
+
+    <div class="panel-heading">
+        <h2>My Contribution History</h2>
+        <p>View your recorded contributions and payments.</p>
+    </div>
+
+    <button
+        type="button"
+        class="primary-btn"
+        id="downloadMemberReport">
+        Download My Contribution Report
+    </button>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Contribution Type</th>
+                    <th>Description</th>
+                    <th>Amount Received</th>
+                </tr>
+            </thead>
+
+            <tbody id="memberContributionHistory">
+                <tr>
+                    <td colspan="4" class="empty-state">
+                        Loading contribution history...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</section>
+
+            <div class="member-table-wrap">
+                <table class="member-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Payment Type</th>
+                            <th>Purpose / Item</th>
+                            <th>Method</th>
+                            <th>Amount Received</th>
+                        </tr>
+                    </thead>
+                    <tbody id="memberHistoryTable">
+                        <tr>
+                            <td colspan="5" class="member-empty">Loading records...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    
+<section class="dashboard-panel">
+    <h2>My Account Details</h2>
+
+    <p>
+        <strong>Name:</strong>
+        <span id="memberNameDisplay">Member</span>
+    </p>
+
+    <p>
+        <strong>Email:</strong>
+        <span id="memberEmailDisplay">Not available</span>
+    </p>
+
+    <p>
+        <strong>Phone:</strong>
+        <span id="memberPhoneDisplay">Not available</span>
+    </p>
+</section>
+
+
+        <footer class="dashboard-footer">
+            Chatrapathi Shivaji Youth 2026 Management System
+        </footer>
+    </main>
+
+    <script>
+        function getArray(key) {
+            try {
+                const value = JSON.parse(localStorage.getItem(key) || "[]");
+                return Array.isArray(value) ? value : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function money(value) {
+            return "₹" + Number(value || 0).toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function normalized(value) {
+            return String(value || "").trim().toLowerCase();
+        }
+
+        function addCell(row, value) {
+            const cell = document.createElement("td");
+            cell.textContent = value || "—";
+            row.appendChild(cell);
+        }
+
+        function getMemberDetails() {
+            const profile = {
+                name: localStorage.getItem("memberName") || "",
+                email: localStorage.getItem("memberEmail") || "",
+                phone: localStorage.getItem("memberPhone") || ""
+            };
+
+            // Use the profile page's saved profile if it exists.
+            try {
+                const savedProfile = JSON.parse(
+                    localStorage.getItem("shivajiMemberProfile") || "null"
+                );
+
+                if (savedProfile && typeof savedProfile === "object") {
+                    profile.name = savedProfile.name || profile.name;
+                    profile.email = savedProfile.email || profile.email;
+                    profile.phone = savedProfile.phone || profile.phone;
+                }
+            } catch (error) {
+                // Ignore malformed optional profile data.
+            }
+
+            return profile;
+        }
+
+        function loadMemberDashboard() {
+            const member = getMemberDetails();
+
+            document.getElementById("welcomeName").textContent =
+                member.name || "Member";
+
+            document.getElementById("profileNameDisplay").textContent =
+                member.name || "Member Name";
+
+            document.getElementById("profileEmailDisplay").textContent =
+                member.email || "Email not available";
+
+            document.getElementById("profilePhoneDisplay").textContent =
+                member.phone || "Phone not available";
+
+            document.getElementById("memberAvatar").textContent =
+                (member.name || "M").trim().charAt(0).toUpperCase() || "M";
+
+            const hasIdentity = Boolean(
+                normalized(member.name) ||
+                normalized(member.email) ||
+                normalized(member.phone)
+            );
+
+            const matchesMember = item => {
+                if (!hasIdentity) return false;
+
+                const nameMatches = normalized(member.name) &&
+                    normalized(item.name) === normalized(member.name);
+
+                const emailMatches = normalized(member.email) &&
+                    normalized(item.email) === normalized(member.email);
+
+                const phoneMatches = normalized(member.phone) &&
+                    normalized(item.phone) === normalized(member.phone);
+
+                return Boolean(nameMatches || emailMatches || phoneMatches);
+            };
+
+            const history = [];
+
+            const chanda = getArray("shivajiChanda").filter(matchesMember);
+
+            chanda.forEach(item => {
+                history.push({
+                    date: item.date || "",
+                    type: "Chanda",
+                    purpose: item.purpose || "Chanda Contribution",
+                    method: item.method || "—",
+                    amount: Number(item.amount || 0)
+                });
+            });
+
+            const auctions = getArray("shivajiAuctions").filter(item => {
+                return matchesMember({
+                    name: item.bidder,
+                    phone: item.phone,
+                    email: item.email
+                });
+            });
+
+            auctions.forEach(item => {
+                const received = Number(item.received || 0);
+
+                if (received > 0) {
+                    history.push({
+                        date: item.date || "",
+                        type: "Auction Payment",
+                        purpose: item.item || "Auction",
+                        method: item.method || "—",
+                        amount: received
+                    });
+                }
+            });
+
+            const events = getArray("shivajiEvents").filter(matchesMember);
+
+            events.forEach(item => {
+                const advance = Number(item.advance || 0);
+
+                if (advance > 0) {
+                    history.push({
+                        date: item.date || "",
+                        type: "Event Advance",
+                        purpose: item.name || "Event",
+                        method: item.method || "—",
+                        amount: advance
+                    });
+                }
+            });
+
+            const payments = getArray("shivajiPayments").filter(matchesMember);
+
+            payments.forEach(item => {
+                const received = Number(item.received || 0);
+
+                if (received > 0) {
+                    history.push({
+                        date: item.date || "",
+                        type: "Payment",
+                        purpose: item.purpose || "Payment Record",
+                        method: item.method || "—",
+                        amount: received
+                    });
+                }
+            });
+
+            const chandaTotal = chanda.reduce(
+                (sum, item) => sum + Number(item.amount || 0), 0
+            );
+
+            const auctionTotal = auctions.reduce(
+                (sum, item) => sum + Number(item.received || 0), 0
+            );
+
+            const eventTotal = events.reduce(
+                (sum, item) => sum + Number(item.advance || 0), 0
+            );
+
+            document.getElementById("memberChanda").textContent =
+                money(chandaTotal);
+
+            document.getElementById("memberAuction").textContent =
+                money(auctionTotal);
+
+            document.getElementById("memberEvents").textContent =
+                money(eventTotal);
+
+            const tbody = document.getElementById("memberHistoryTable");
+            tbody.replaceChildren();
+
+            history.sort((a, b) => b.date.localeCompare(a.date));
+
+            if (!hasIdentity) {
+                document.getElementById("memberMessage").textContent =
+                    "No member identity is saved in this browser. Your login and profile must be connected to identify your records.";
+            } else if (history.length === 0) {
+                document.getElementById("memberMessage").textContent =
+                    "No payment records matched the saved profile. Check that transaction names, phone numbers, or emails match your profile.";
+            } else {
+                document.getElementById("memberMessage").textContent =
+                    history.length + " matching payment record(s) found.";
+            }
+
+            if (history.length === 0) {
+                const row = document.createElement("tr");
+                const cell = document.createElement("td");
+                cell.colSpan = 5;
+                cell.className = "member-empty";
+                cell.textContent = "No matching payment history available.";
+                row.appendChild(cell);
+                tbody.appendChild(row);
+                return;
+            }
+
+            history.forEach(item => {
+                const row = document.createElement("tr");
+                addCell(row, item.date);
+                addCell(row, item.type);
+                addCell(row, item.purpose);
+                addCell(row, item.method);
+                addCell(row, money(item.amount));
+                tbody.appendChild(row);
+            });
+        }
+
+        document.getElementById("refreshButton").addEventListener(
+            "click", loadMemberDashboard
+        );
+
+        document.getElementById("printButton").addEventListener(
+            "click", function() {
+                window.print();
+            }
+        );
+
+        window.addEventListener("storage", loadMemberDashboard);
+
+        loadMemberDashboard();
+    </script>
+
+
+<script>
+    function loadMemberAnnouncements() {
+        const container = document.getElementById("memberAnnouncements");
+
+        if (!container) return;
+
+        let announcements = [];
+
+        try {
+            announcements = JSON.parse(
+                localStorage.getItem("shivajiAnnouncements") || "[]"
+            );
+
+            if (!Array.isArray(announcements)) {
+                announcements = [];
+            }
+        } catch (error) {
+            announcements = [];
+        }
+
+        container.replaceChildren();
+
+        const today = new Date();
+        const todayString =
+            today.getFullYear() + "-" +
+            String(today.getMonth() + 1).padStart(2, "0") + "-" +
+            String(today.getDate()).padStart(2, "0");
+
+        announcements = announcements
+            .filter(item => {
+                return !item.expiryDate || item.expiryDate >= todayString;
+            })
+            .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+        if (announcements.length === 0) {
+            const empty = document.createElement("p");
+            empty.className = "empty-state";
+            empty.textContent = "No current announcements available.";
+            container.appendChild(empty);
+            return;
+        }
+
+        announcements.forEach(item => {
+            const card = document.createElement("div");
+            card.style.cssText =
+                "padding:16px;margin-bottom:14px;border:1px solid #e5e9f1;" +
+                "border-left:4px solid #f59e0b;border-radius:10px;";
+
+            const title = document.createElement("h3");
+            title.textContent = item.title || "Announcement";
+
+            const details = document.createElement("p");
+            details.textContent = item.message || "";
+            details.style.cssText = "margin:10px 0;white-space:pre-wrap;";
+
+            const info = document.createElement("p");
+            info.style.cssText = "color:#68758a;font-size:13px;";
+            info.textContent =
+                "Category: " + (item.category || "General") +
+                " | Priority: " + (item.priority || "Normal") +
+                " | Date: " + (item.date || "Not specified");
+
+            card.append(title, details, info);
+            container.appendChild(card);
+        });
+    }
+
+    loadMemberAnnouncements();
+</script>
+
+<script>
+    function displayLoggedInMember() {
+        const name = localStorage.getItem("memberName");
+        const email = localStorage.getItem("memberEmail");
+        const phone = localStorage.getItem("memberPhone");
+
+        const welcomeName = document.getElementById("welcomeName");
+
+        if (welcomeName) {
+            welcomeName.textContent = name || "Member";
+        }
+
+        const emailElement = document.getElementById("memberEmailDisplay");
+        const phoneElement = document.getElementById("memberPhoneDisplay");
+
+        if (emailElement) {
+            emailElement.textContent = email || "Not available";
+        }
+
+        if (phoneElement) {
+            phoneElement.textContent = phone || "Not available";
+        }
+        const nameElement = document.getElementById("memberNameDisplay");
+
+if (nameElement) {
+    nameElement.textContent = name || "Member";
+}
+}
+
+
+    displayLoggedInMember();
+</script>
+
+<script>
+    const logoutButton = document.getElementById("memberLogoutBtn");
+
+    if (logoutButton) {
+        logoutButton.addEventListener("click", function() {
+            const confirmLogout = confirm("Are you sure you want to log out?");
+
+            if (confirmLogout) {
+                localStorage.removeItem("memberName");
+                localStorage.removeItem("memberEmail");
+                localStorage.removeItem("memberPhone");
+                localStorage.removeItem("shivajiMemberProfile");
+
+                window.location.href = "user-login.html";
+            }
+        });
+    }
+</script>
+
+<script>
+    function loadMemberContributionSummary() {
+        const email = (
+            localStorage.getItem("memberEmail") || ""
+        ).trim().toLowerCase();
+
+        const phone = (
+            localStorage.getItem("memberPhone") || ""
+        ).trim();
+
+        const name = (
+            localStorage.getItem("memberName") || ""
+        ).trim().toLowerCase();
+
+        function readRecords(key) {
+            try {
+                const records = JSON.parse(
+                    localStorage.getItem(key) || "[]"
+                );
+
+                return Array.isArray(records) ? records : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function matchesMember(record) {
+            const recordEmail = String(record.email || "")
+                .trim().toLowerCase();
+
+            const recordPhone = String(record.phone || "").trim();
+
+            const recordName = String(
+                record.name || record.bidder || ""
+            ).trim().toLowerCase();
+
+            if (email && recordEmail) {
+                return email === recordEmail;
+            }
+
+            if (phone && recordPhone) {
+                return phone === recordPhone;
+            }
+
+            return Boolean(name && recordName && name === recordName);
+        }
+
+        function total(records, field) {
+            return records
+                .filter(matchesMember)
+                .reduce((sum, record) => {
+                    const amount = Number(record[field]);
+                    return sum + (
+                        Number.isFinite(amount) && amount > 0
+                            ? amount
+                            : 0
+                    );
+                }, 0);
+        }
+
+        const chanda = total(readRecords("shivajiChanda"), "amount");
+        const auctions = total(readRecords("shivajiAuctions"), "received");
+        const payments = total(readRecords("shivajiPayments"), "received");
+
+        function showAmount(id, amount) {
+            const element = document.getElementById(id);
+
+            if (element) {
+                element.textContent = "₹" +
+                    amount.toLocaleString("en-IN", {
+                        maximumFractionDigits: 2
+                    });
+            }
+        }
+
+        showAmount("memberChandaTotal", chanda);
+        showAmount("memberAuctionTotal", auctions);
+        showAmount("memberPaymentTotal", payments);
+        showAmount(
+            "memberContributionTotal",
+            chanda + auctions + payments
+        );
+    }
+
+    loadMemberContributionSummary();
+</script>
+
+<script>
+function loadMemberContributionHistory() {
+    const table = document.getElementById("memberContributionHistory");
+
+    if (!table) return;
+
+    const memberEmail = (
+        localStorage.getItem("memberEmail") || ""
+    ).trim().toLowerCase();
+
+    const memberPhone = (
+        localStorage.getItem("memberPhone") || ""
+    ).trim();
+
+    const memberName = (
+        localStorage.getItem("memberName") || ""
+    ).trim().toLowerCase();
+
+    function readRecords(key) {
+        try {
+            const data = JSON.parse(localStorage.getItem(key) || "[]");
+            return Array.isArray(data) ? data : [];
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function matchesMember(record) {
+        const email = String(record.email || "").trim().toLowerCase();
+        const phone = String(record.phone || "").trim();
+        const name = String(record.name || record.bidder || "")
+            .trim().toLowerCase();
+
+        if (memberEmail && email) {
+            return memberEmail === email;
+        }
+
+        if (memberPhone && phone) {
+            return memberPhone === phone;
+        }
+
+        return Boolean(memberName && name && memberName === name);
+    }
+
+    const records = [];
+
+    readRecords("shivajiChanda")
+        .filter(matchesMember)
+        .forEach(item => {
+            records.push({
+                date: item.date || "",
+                type: "Chanda",
+                description: item.purpose || "Chanda Contribution",
+                amount: Number(item.amount) || 0
+            });
+        });
+
+    readRecords("shivajiAuctions")
+        .filter(matchesMember)
+        .forEach(item => {
+            records.push({
+                date: item.date || "",
+                type: "Auction Payment",
+                description: item.item || "Auction",
+                amount: Number(item.received) || 0
+            });
+        });
+
+    readRecords("shivajiPayments")
+        .filter(matchesMember)
+        .forEach(item => {
+            records.push({
+                date: item.date || "",
+                type: "Payment",
+                description: item.purpose || "Other Payment",
+                amount: Number(item.received) || 0
+            });
+        });
+
+    records.sort((a, b) => b.date.localeCompare(a.date));
+
+    table.replaceChildren();
+
+    if (records.length === 0) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+
+        cell.colSpan = 4;
+        cell.className = "empty-state";
+        cell.textContent = "No matching contribution records found.";
+
+        row.appendChild(cell);
+        table.appendChild(row);
+        return;
+    }
+
+    records.forEach(record => {
+        const row = document.createElement("tr");
+
+        [
+            record.date || "—",
+            record.type,
+            record.description,
+            "₹" + record.amount.toLocaleString("en-IN")
+        ].forEach(value => {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+        });
+
+        table.appendChild(row);
+    });
+}
+
+loadMemberContributionHistory();
+</script>
+
+<script>
+document.getElementById("downloadMemberReport")
+    .addEventListener("click", function () {
+
+        const table = document.getElementById(
+            "memberContributionHistory"
+        );
+
+        if (!table) {
+            alert("Contribution history table was not found.");
+            return;
+        }
+
+        const rows = Array.from(table.querySelectorAll("tr"));
+
+        const records = rows
+            .map(row => Array.from(row.querySelectorAll("td"))
+                .map(cell => cell.textContent.trim()))
+            .filter(cells => cells.length === 4);
+
+        if (
+            records.length === 0 ||
+            records.every(cells =>
+                cells[0] === "No matching contribution records found."
+            )
+        ) {
+            alert("No contribution records are available to download.");
+            return;
+        }
+
+        function escapeCSV(value) {
+            let text = String(value ?? "");
+
+            // Prevent spreadsheet formula execution.
+            if (/^[=+\-@\t\r]/.test(text)) {
+                text = "'" + text;
+            }
+
+            return '"' + text.replace(/"/g, '""') + '"';
+        }
+
+        const header = [
+            "Date",
+            "Contribution Type",
+            "Description",
+            "Amount Received"
+        ];
+
+        const csv = [header, ...records]
+            .map(row => row.map(escapeCSV).join(","))
+            .join("\r\n");
+
+        const blob = new Blob(
+            ["\uFEFF" + csv],
+            { type: "text/csv;charset=utf-8;" }
+        );
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = "my-contribution-report.csv";
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        URL.revokeObjectURL(url);
+    });
+</script>
+
+
+
+
+</body>
+</html>

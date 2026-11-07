@@ -1,0 +1,313 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expenses | Shivaji Youth 2026</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-body">
+
+    <aside class="sidebar">
+        <h2>🟠 Shivaji Youth</h2>
+        <p class="sidebar-subtitle">Management System</p>
+
+        <nav class="side-nav">
+            <a href="admin-dashboard.html">📊 Dashboard</a>
+            <a href="events.html">🎉 Events</a>
+            <a href="members.html">👥 Members</a>
+            <a href="chanda.html">💰 Chanda Collections</a>
+            <a href="auctions.html">🔨 Auctions</a>
+            <a class="active" href="expenses.html">🧾 Expenses</a>
+            <a href="payments.html">💳 Payments</a>
+            <a href="reports.html">📈 Reports</a>
+        </nav>
+
+        <a class="logout-link" href="admin-login.html">↩ Logout</a>
+    </aside>
+
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <div>
+                <h1>Expenses Management</h1>
+                <p>Record and monitor association spending.</p>
+            </div>
+            <span class="admin-badge">Administrator</span>
+        </header>
+
+        <section class="summary-grid">
+            <article class="summary-card">
+                <span>Total Expenses</span>
+                <h2 id="expenseCount">0</h2>
+                <p>Number of expense records</p>
+            </article>
+
+            <article class="summary-card">
+                <span>Total Amount Spent</span>
+                <h2 id="spentTotal">₹0</h2>
+                <p>Expenses recorded as paid</p>
+            </article>
+
+            <article class="summary-card">
+                <span>Pending Payments</span>
+                <h2 id="expensePending">₹0</h2>
+                <p>Expenses not fully paid</p>
+            </article>
+        </section>
+
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+                <h2>Record New Expense</h2>
+                <p>Choose a category and enter the amount and payment status.</p>
+            </div>
+
+            
+<form id="expenseForm">
+
+    <div class="expense-form-field">
+        <label for="expenseTitle">Expense Description</label>
+        <input type="text" id="expenseTitle"
+               placeholder="e.g. Purchase for festival decorations" required>
+    </div>
+
+    <div class="expense-form-field">
+        <label for="expenseDate">Expense Date</label>
+        <input type="date" id="expenseDate" required>
+    </div>
+
+    <div class="expense-form-field">
+        <label for="expenseCategory">Expense Category</label>
+        <select id="expenseCategory" required>
+            <option value="">Select category</option>
+            <option>Pooja Samagri</option>
+            <option>Prasadam</option>
+            <option>Sarees</option>
+            <option>Jewellery</option>
+            <option>Annadanam Groceries</option>
+            <option>Flags</option>
+            <option>Decoration</option>
+            <option>Sound System</option>
+            <option>Lighting</option>
+            <option>Transportation</option>
+            <option>Venue Booking</option>
+            <option>Printing and Banners</option>
+            <option>Community Service</option>
+            <option>Other</option>
+        </select>
+    </div>
+
+    <div class="expense-form-field">
+        <label for="expenseEvent">Related Event (optional)</label>
+        <select id="expenseEvent">
+            <option value="">Select related event</option>
+        </select>
+    </div>
+
+    <div class="expense-form-field">
+        <label for="vendorName">Vendor / Person Paid (optional)</label>
+        <input type="text" id="vendorName"
+               placeholder="Enter vendor or recipient name">
+    </div>
+
+    <div class="expense-form-field">
+        <label for="expenseAmount">Total Expense Amount (₹)</label>
+        <input type="number" id="expenseAmount"
+               min="0.01" step="0.01"
+               placeholder="Enter total amount" required>
+    </div>
+
+    <div class="expense-form-field">
+        <label for="expensePaid">Amount Paid So Far (₹)</label>
+        <input type="number" id="expensePaid"
+               min="0" step="0.01" value="0" required>
+    </div>
+
+    <div class="expense-form-field">
+        <label for="expenseMethod">Payment Method</label>
+        <select id="expenseMethod" required>
+            <option value="">Select payment method</option>
+            <option>Cash</option>
+            <option>UPI</option>
+            <option>Bank Transfer</option>
+            <option>Other</option>
+        </select>
+    </div>
+
+    <div class="expense-form-field">
+        <label for="expenseNotes">Notes (optional)</label>
+        <textarea id="expenseNotes" rows="3"
+                  placeholder="Bill number or additional details"></textarea>
+    </div>
+
+    <div class="expense-form-actions">
+        <button type="submit" class="primary-btn">Save Expense</button>
+    </div>
+
+    <p id="expenseMessage" class="form-message"></p>
+
+</form>
+
+        </section>
+
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+                <h2>Expense Records</h2>
+                <p>Review paid and outstanding amounts for each expense.</p>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Event</th>
+                            <th>Total</th>
+                            <th>Paid</th>
+                            <th>Remaining</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expenseTable">
+                        <tr>
+                            <td colspan="8" class="empty-state">
+                                No expenses recorded yet.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const expenseForm = document.getElementById("expenseForm");
+        const expenseTable = document.getElementById("expenseTable");
+        const expenseMessage = document.getElementById("expenseMessage");
+
+        let expenses = JSON.parse(
+            localStorage.getItem("shivajiExpenses") || "[]"
+        );
+
+        function money(amount) {
+            return "₹" + amount.toLocaleString("en-IN", {
+                maximumFractionDigits: 2
+            });
+        }
+
+        function safeText(value) {
+            return String(value ?? "").replace(/[&<>"']/g, ch => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[ch]);
+        }
+
+        function renderExpenses() {
+            const paidTotal = expenses.reduce(
+                (sum, item) => sum + item.paid, 0
+            );
+
+            const pendingTotal = expenses.reduce(
+                (sum, item) => sum + item.amount - item.paid, 0
+            );
+
+            document.getElementById("expenseCount").textContent =
+                expenses.length;
+            document.getElementById("spentTotal").textContent =
+                money(paidTotal);
+            document.getElementById("expensePending").textContent =
+                money(pendingTotal);
+
+            if (expenses.length === 0) {
+                expenseTable.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="empty-state">
+                            No expenses recorded yet.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            expenseTable.innerHTML = expenses.map((item, index) => `
+                <tr>
+                    <td>${safeText(item.date)}</td>
+                    <td>${safeText(item.title)}</td>
+                    <td>${safeText(item.category)}</td>
+                    <td>${safeText(item.event || "-")}</td>
+                    <td>${money(item.amount)}</td>
+                    <td>${money(item.paid)}</td>
+                    <td>${money(item.amount - item.paid)}</td>
+                    <td>
+                        <button type="button" onclick="deleteExpense(${index})">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            `).join("");
+        }
+
+        expenseForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const title = document.getElementById("expenseTitle").value.trim();
+            const date = document.getElementById("expenseDate").value;
+            const category = document.getElementById("expenseCategory").value;
+            const relatedEvent = document.getElementById("expenseEvent").value.trim();
+            const vendor = document.getElementById("vendorName").value.trim();
+            const amount = Number(document.getElementById("expenseAmount").value);
+            const paid = Number(document.getElementById("expensePaid").value);
+            const method = document.getElementById("expenseMethod").value;
+            const notes = document.getElementById("expenseNotes").value.trim();
+
+            if (!title || !date || !category || !method ||
+                !Number.isFinite(amount) || !Number.isFinite(paid) ||
+                amount <= 0 || paid < 0 || paid > amount) {
+                expenseMessage.textContent =
+                    "Enter valid details. Amount paid cannot exceed the total expense.";
+                return;
+            }
+
+            expenses.push({
+                title,
+                date,
+                category,
+                event: relatedEvent,
+                vendor,
+                amount,
+                paid,
+                method,
+                notes
+            });
+
+            localStorage.setItem(
+                "shivajiExpenses", JSON.stringify(expenses)
+            );
+
+            expenseForm.reset();
+            document.getElementById("expensePaid").value = "0";
+            expenseMessage.textContent = "Expense saved successfully.";
+            renderExpenses();
+        });
+
+        function deleteExpense(index) {
+            if (confirm("Are you sure you want to delete this expense?")) {
+                expenses.splice(index, 1);
+
+                localStorage.setItem(
+                    "shivajiExpenses", JSON.stringify(expenses)
+                );
+
+                renderExpenses();
+                expenseMessage.textContent = "Expense record deleted.";
+            }
+        }
+
+        renderExpenses();
+    </script>
+</body>
+</html>

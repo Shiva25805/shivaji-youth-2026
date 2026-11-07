@@ -1,0 +1,462 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backup & Restore | Shivaji Youth 2026</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .backup-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+            margin-bottom: 24px;
+        }
+
+        .backup-panel {
+            background: white;
+            border: 1px solid #e5e9f1;
+            border-radius: 14px;
+            padding: 24px;
+        }
+
+        .backup-icon {
+            font-size: 34px;
+            margin-bottom: 14px;
+        }
+
+        .backup-panel h2 {
+            margin-bottom: 10px;
+        }
+
+        .backup-panel p {
+            color: #68758a;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .backup-button {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #e99519;
+            color: #172033;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .restore-button {
+            background: #176b49;
+            color: white;
+        }
+
+        .file-input {
+            display: block;
+            width: 100%;
+            margin: 15px 0;
+            padding: 12px;
+            border: 1px dashed #aab5c5;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .warning-box {
+            background: #fff4df;
+            border-left: 4px solid #e99519;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            color: #704b0a;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .status-message {
+            margin-top: 15px;
+            font-size: 14px;
+            overflow-wrap: anywhere;
+        }
+
+        .backup-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .backup-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .backup-table th, .backup-table td {
+            padding: 13px;
+            border-bottom: 1px solid #edf0f5;
+            font-size: 14px;
+        }
+
+        .backup-table th {
+            background: #f7f8fc;
+            color: #58657a;
+        }
+
+        @media(max-width: 800px) {
+            .backup-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .backup-panel {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body class="dashboard-body">
+
+    <aside class="sidebar">
+        <h2>🟠 Shivaji Youth</h2>
+        <p class="sidebar-subtitle">2026 Management System</p>
+
+        <nav class="side-nav">
+            <a href="admin-dashboard.html">Dashboard</a>
+            <a href="events.html">Events</a>
+            <a href="members.html">Members</a>
+            <a href="member-history.html">Member History</a>
+            <a href="chanda.html">Chanda Collection</a>
+            <a href="auctions.html">Auctions</a>
+            <a href="expenses.html">Expenses</a>
+            <a href="payments.html">Payments</a>
+            <a href="reports.html">Reports</a>
+            <a href="receipts.html">Receipts</a>
+            <a href="backup.html" class="active">Backup & Restore</a>
+        </nav>
+
+        <a href="admin-login.html" class="logout-link">Back to Admin Login</a>
+    </aside>
+
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <div>
+                <h1>Data Backup & Restore</h1>
+                <p>Download and restore your association records.</p>
+            </div>
+            <span class="admin-badge">Data Protection</span>
+        </header>
+
+        <div class="warning-box">
+            <strong>Important:</strong> Your current records are stored in this
+            browser. Download backups regularly and keep a copy somewhere safe.
+            Restoring a backup replaces the matching records in this browser.
+            It does not merge them.
+        </div>
+
+        <section class="backup-grid">
+            <article class="backup-panel">
+                <div class="backup-icon">📥</div>
+                <h2>Create Backup</h2>
+                <p>
+                    Download the saved members, events, chanda, auctions,
+                    expenses, payments, and receipt sequence as a JSON file.
+                </p>
+
+                <button class="backup-button" id="downloadBackup" type="button">
+                    Download Backup
+                </button>
+
+                <p class="status-message" id="backupMessage" role="status"></p>
+            </article>
+
+            <article class="backup-panel">
+                <div class="backup-icon">📤</div>
+                <h2>Restore Backup</h2>
+                <p>
+                    Choose a backup JSON file created by this page. Review the
+                    warning and confirm before replacing current records.
+                </p>
+
+                <input class="file-input" id="backupFile"
+                       type="file" accept=".json,application/json">
+
+                <button class="backup-button restore-button"
+                        id="restoreBackup" type="button">
+                    Restore Selected Backup
+                </button>
+
+                <p class="status-message" id="restoreMessage" role="status"></p>
+            </article>
+        </section>
+
+        <section class="backup-panel">
+            <h2>Current Local Records</h2>
+            <p>These counts are read from the current browser's saved records.</p>
+
+            <div class="backup-table-wrapper">
+                <table class="backup-table">
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th>Saved Records</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordCounts"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const DATA_KEYS = {
+            "Members": "shivajiMembers",
+            "Events": "shivajiEvents",
+            "Chanda": "shivajiChanda",
+            "Auctions": "shivajiAuctions",
+            "Expenses": "shivajiExpenses",
+            "Payments": "shivajiPayments",
+            "Announcements": "shivajiAnnouncements"
+        };
+
+        const RECEIPT_SEQUENCE_KEY = "shivajiReceiptSequence";
+        const BACKUP_VERSION = 1;
+        const MAX_BACKUP_SIZE = 10 * 1024 * 1024;
+
+        function readArray(key) {
+            try {
+                const value = JSON.parse(localStorage.getItem(key) || "[]");
+                return Array.isArray(value) ? value : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function renderCounts() {
+            const tbody = document.getElementById("recordCounts");
+            tbody.replaceChildren();
+
+            Object.entries(DATA_KEYS).forEach(([label, key]) => {
+                const row = document.createElement("tr");
+                const nameCell = document.createElement("td");
+                const countCell = document.createElement("td");
+
+                nameCell.textContent = label;
+                countCell.textContent = readArray(key).length;
+
+                row.append(nameCell, countCell);
+                tbody.appendChild(row);
+            });
+
+            const sequenceRow = document.createElement("tr");
+            const sequenceName = document.createElement("td");
+            const sequenceValue = document.createElement("td");
+
+            sequenceName.textContent = "Receipt sequence";
+            sequenceValue.textContent =
+                localStorage.getItem(RECEIPT_SEQUENCE_KEY) || "0";
+
+            sequenceRow.append(sequenceName, sequenceValue);
+            tbody.appendChild(sequenceRow);
+        }
+
+        function showMessage(id, text) {
+            document.getElementById(id).textContent = text;
+        }
+
+        document.getElementById("downloadBackup").addEventListener("click", function() {
+            try {
+                const data = {};
+
+                Object.values(DATA_KEYS).forEach(key => {
+                    const raw = localStorage.getItem(key);
+
+                    if (raw === null) {
+                        data[key] = [];
+                    } else {
+                        const parsed = JSON.parse(raw);
+
+                        if (!Array.isArray(parsed)) {
+                            throw new Error(
+                                "Invalid saved data in " + key +
+                                ". Backup was not created."
+                            );
+                        }
+
+                        data[key] = parsed;
+                    }
+                });
+
+                const sequence = Number(
+                    localStorage.getItem(RECEIPT_SEQUENCE_KEY) || "0"
+                );
+
+                if (!Number.isSafeInteger(sequence) || sequence < 0) {
+                    throw new Error("The saved receipt sequence is invalid.");
+                }
+
+                data[RECEIPT_SEQUENCE_KEY] = sequence;
+
+                const backup = {
+                    application: "Chatrapathi Shivaji Youth 2026",
+                    backupVersion: BACKUP_VERSION,
+                    createdAt: new Date().toISOString(),
+                    data
+                };
+
+                const blob = new Blob(
+                    [JSON.stringify(backup, null, 2)],
+                    { type: "application/json" }
+                );
+
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+
+                link.href = url;
+                link.download = "shivaji-youth-backup-" +
+                    new Date().toISOString().slice(0, 10) + ".json";
+
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                URL.revokeObjectURL(url);
+
+                showMessage(
+                    "backupMessage",
+                    "Backup download started. Store the file safely."
+                );
+            } catch (error) {
+                showMessage("backupMessage", error.message);
+            }
+        });
+
+        document.getElementById("restoreBackup").addEventListener("click", async function() {
+            const fileInput = document.getElementById("backupFile");
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showMessage("restoreMessage", "Please select a backup JSON file.");
+                return;
+            }
+
+            if (file.size > MAX_BACKUP_SIZE) {
+                showMessage("restoreMessage", "The backup file is too large.");
+                return;
+            }
+
+            let backup;
+
+            try {
+                const text = await file.text();
+                backup = JSON.parse(text);
+            } catch (error) {
+                showMessage("restoreMessage", "The selected file is not valid JSON.");
+                return;
+            }
+
+            if (
+                !backup ||
+                backup.application !== "Chatrapathi Shivaji Youth 2026" ||
+                backup.backupVersion !== BACKUP_VERSION ||
+                !backup.data ||
+                typeof backup.data !== "object" ||
+                Array.isArray(backup.data)
+            ) {
+                showMessage(
+                    "restoreMessage",
+                    "This file is not a supported Shivaji Youth backup."
+                );
+                return;
+            }
+
+            const newData = {};
+
+            for (const key of Object.values(DATA_KEYS)) {
+                const records = backup.data[key];
+
+                if (!Array.isArray(records)) {
+                    showMessage(
+                        "restoreMessage",
+                        "Backup is missing a valid records list: " + key
+                    );
+                    return;
+                }
+
+                newData[key] = records;
+            }
+
+            const sequence = backup.data[RECEIPT_SEQUENCE_KEY];
+
+            if (
+                !Number.isSafeInteger(sequence) ||
+                sequence < 0
+            ) {
+                showMessage(
+                    "restoreMessage",
+                    "The backup has an invalid receipt sequence."
+                );
+                return;
+            }
+
+            const confirmed = confirm(
+                "WARNING: Restoring this backup will REPLACE the current " +
+                "members, events, chanda, auctions, expenses and payments " +
+                "in this browser. Download a backup of current data first. " +
+                "Do you want to continue?"
+            );
+
+            if (!confirmed) {
+                showMessage("restoreMessage", "Restore cancelled. Your data was not changed.");
+                return;
+            }
+
+            const keysToReplace = [
+                ...Object.values(DATA_KEYS),
+                RECEIPT_SEQUENCE_KEY
+            ];
+
+            // Keep a rollback copy in case a write fails.
+            const previous = {};
+
+            keysToReplace.forEach(key => {
+                previous[key] = localStorage.getItem(key);
+            });
+
+            try {
+                Object.values(DATA_KEYS).forEach(key => {
+                    localStorage.setItem(key, JSON.stringify(newData[key]));
+                });
+
+                localStorage.setItem(RECEIPT_SEQUENCE_KEY, String(sequence));
+
+                showMessage(
+                    "restoreMessage",
+                    "Backup restored successfully. Refresh other open pages to see the restored records."
+                );
+
+                renderCounts();
+            } catch (error) {
+                // Attempt to restore the values that existed before the import.
+                keysToReplace.forEach(key => {
+                    try {
+                        if (previous[key] === null) {
+                            localStorage.removeItem(key);
+                        } else {
+                            localStorage.setItem(key, previous[key]);
+                        }
+                    } catch (rollbackError) {
+                        // Browser storage may be unavailable or full.
+                    }
+                });
+
+                showMessage(
+                    "restoreMessage",
+                    "Restore failed. The page attempted to recover the previous data. Check your storage before continuing."
+                );
+            }
+        });
+
+        window.addEventListener("storage", renderCounts);
+        renderCounts();
+    </script>
+
+</body>
+</html>

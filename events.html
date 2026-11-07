@@ -1,0 +1,259 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events Management | Shivaji Youth 2026</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-body">
+
+    <aside class="sidebar">
+        <h2>🟠 Shivaji Youth</h2>
+        <p class="sidebar-subtitle">Management System</p>
+
+        <nav class="side-nav">
+            <a href="admin-dashboard.html">📊 Dashboard</a>
+            <a class="active" href="events.html">🎉 Events</a>
+            <a href="members.html">👥 Members</a>
+            <a href="chanda.html">💰 Chanda Collections</a>
+            <a href="auctions.html">🔨 Auctions</a>
+            <a href="expenses.html">🧾 Expenses</a>
+            <a href="payments.html">💳 Payments</a>
+            <a href="reports.html">📈 Reports</a>
+        </nav>
+
+        <a class="logout-link" href="admin-login.html">↩ Logout</a>
+    </aside>
+
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <div>
+                <h1>Events Management</h1>
+                <p>Create events and track their payments.</p>
+            </div>
+            <span class="admin-badge">Administrator</span>
+        </header>
+
+        <section class="summary-grid">
+            <article class="summary-card">
+                <span>Total Events</span>
+                <h2 id="totalEvents">0</h2>
+            </article>
+
+            <article class="summary-card">
+                <span>Total Event Amount</span>
+                <h2 id="totalAmount">₹0</h2>
+            </article>
+
+            <article class="summary-card">
+                <span>Advance Paid</span>
+                <h2 id="totalAdvance">₹0</h2>
+            </article>
+
+            <article class="summary-card balance-card">
+                <span>Remaining Amount</span>
+                <h2 id="totalRemaining">₹0</h2>
+            </article>
+        </section>
+
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+                <h2>Create New Event</h2>
+                <p>Enter the event details and payment information.</p>
+            </div>
+
+            
+<form id="eventForm" class="event-form-grid">
+
+    <div class="event-form-field">
+        <label for="eventName">Event Name</label>
+        <input type="text" id="eventName"
+               placeholder="e.g. Shivaji Jayanti" required>
+    </div>
+
+    <div class="event-form-field">
+        <label for="eventDate">Event Date</label>
+        <input type="date" id="eventDate" required>
+    </div>
+
+    <div class="event-form-field">
+        <label for="eventPurpose">Event Purpose</label>
+        <select id="eventPurpose" required>
+            <option value="">Select purpose</option>
+            <option>Festival</option>
+            <option>Pooja</option>
+            <option>Annadanam</option>
+            <option>Cultural Program</option>
+            <option>Community Service</option>
+            <option>Other</option>
+        </select>
+    </div>
+
+    <div class="event-form-field">
+        <label for="eventAmount">Total Event Amount (₹)</label>
+        <input type="number" id="eventAmount"
+               min="0" step="0.01"
+               placeholder="Enter total amount" required>
+    </div>
+
+    <div class="event-form-field">
+        <label for="eventAdvance">Advance Paid (₹)</label>
+        <input type="number" id="eventAdvance"
+               min="0" step="0.01" value="0" required>
+    </div>
+
+    <div class="event-form-field">
+        <label for="eventNotes">Notes</label>
+        <textarea id="eventNotes"
+                  placeholder="Vendor details or other information"
+                  rows="3"></textarea>
+    </div>
+
+    <div class="event-form-actions">
+        <button type="submit" class="primary-btn">
+            Save Event
+        </button>
+    </div>
+
+    <p id="eventMessage" class="form-message"></p>
+
+</form>
+
+        </section>
+
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+                <h2>Event Records</h2>
+                <p>Review the total, advance and outstanding balance.</p>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Date</th>
+                            <th>Purpose</th>
+                            <th>Total (₹)</th>
+                            <th>Advance (₹)</th>
+                            <th>Remaining (₹)</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventTable">
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                No events added yet.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const eventForm = document.getElementById("eventForm");
+        const eventTable = document.getElementById("eventTable");
+        const eventMessage = document.getElementById("eventMessage");
+
+        // Demo storage: records stay in this browser on this computer.
+        let events = JSON.parse(localStorage.getItem("shivajiEvents") || "[]");
+
+        function money(amount) {
+            return "₹" + amount.toLocaleString("en-IN", {
+                maximumFractionDigits: 2
+            });
+        }
+
+        function renderEvents() {
+            const totalAmount = events.reduce((sum, event) => sum + event.amount, 0);
+            const totalAdvance = events.reduce((sum, event) => sum + event.advance, 0);
+            const totalRemaining = events.reduce(
+                (sum, event) => sum + event.amount - event.advance, 0
+            );
+
+            document.getElementById("totalEvents").textContent = events.length;
+            document.getElementById("totalAmount").textContent = money(totalAmount);
+            document.getElementById("totalAdvance").textContent = money(totalAdvance);
+            document.getElementById("totalRemaining").textContent = money(totalRemaining);
+
+            if (events.length === 0) {
+                eventTable.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            No events added yet.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            eventTable.innerHTML = events.map((event, index) => `
+                <tr>
+                    <td>${escapeHTML(event.name)}</td>
+                    <td>${escapeHTML(event.date)}</td>
+                    <td>${escapeHTML(event.purpose)}</td>
+                    <td>${money(event.amount)}</td>
+                    <td>${money(event.advance)}</td>
+                    <td>${money(event.amount - event.advance)}</td>
+                    <td>
+                        <button type="button"
+                            onclick="deleteEvent(${index})">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            `).join("");
+        }
+
+        function escapeHTML(value) {
+            return String(value).replace(/[&<>"']/g, character => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[character]);
+        }
+
+        eventForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById("eventName").value.trim();
+            const date = document.getElementById("eventDate").value;
+            const purpose = document.getElementById("eventPurpose").value;
+            const amount = Number(document.getElementById("eventAmount").value);
+            const advance = Number(document.getElementById("eventAdvance").value);
+            const notes = document.getElementById("eventNotes").value.trim();
+
+            if (amount < 0 || advance < 0 || advance > amount) {
+                eventMessage.textContent =
+                    "Advance must be between ₹0 and the total event amount.";
+                return;
+            }
+
+            events.push({ name, date, purpose, amount, advance, notes });
+
+            localStorage.setItem("shivajiEvents", JSON.stringify(events));
+
+            eventForm.reset();
+            document.getElementById("eventAdvance").value = "0";
+            eventMessage.textContent = "Event saved successfully.";
+            renderEvents();
+        });
+
+        function deleteEvent(index) {
+            if (confirm("Are you sure you want to delete this event?")) {
+                events.splice(index, 1);
+                localStorage.setItem("shivajiEvents", JSON.stringify(events));
+                renderEvents();
+                eventMessage.textContent = "Event deleted.";
+            }
+        }
+
+        renderEvents();
+    </script>
+</body>
+</html>

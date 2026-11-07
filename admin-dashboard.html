@@ -1,0 +1,330 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Shivaji Youth 2026</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-body">
+
+    <aside class="sidebar" id="sidebar">
+        <h2>🟠 Shivaji Youth</h2>
+        <p class="sidebar-subtitle">Management System</p>
+
+        <nav class="side-nav">
+            <a href="receipts.html">Receipts</a>
+            <a href="member-history.html">Member History</a>
+            <a href="backup.html">Backup & Restore</a>
+            <a href="announcements.html">Announcements</a>
+            <a class="active" href="admin-dashboard.html">📊 Dashboard</a>
+            <a href="events.html">🎉 Events</a>
+            <a href="members.html">👥 Members</a>
+            <a href="chanda.html">💰 Chanda Collections</a>
+            <a href="auctions.html">🔨 Auctions</a>
+            <a href="expenses.html">🧾 Expenses</a>
+            <a href="payments.html">💳 Payments</a>
+            <a href="reports.html">📈 Reports</a>
+        </nav>
+
+        <a class="logout-link" href="admin-login.html">↩ Logout</a>
+    </aside>
+
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <button id="menuToggle" class="menu-toggle"
+                    aria-label="Toggle navigation">☰</button>
+            <div>
+                <h1>Admin Dashboard</h1>
+                <p>Welcome to Chatrapathi Shivaji Youth 2026</p>
+            </div>
+            <span class="admin-badge">Administrator</span>
+        </header>
+
+        <section class="summary-grid">
+            <article class="summary-card">
+                <span>Total Chanda</span>
+                <h2 id="chandaTotal">₹0</h2>
+                <p>Recorded contributions</p>
+            </article>
+
+            <article class="summary-card">
+                <span>Auction Collections</span>
+                <h2 id="auctionTotal">₹0</h2>
+                <p>Recorded auction payments</p>
+            </article>
+
+            <article class="summary-card">
+                <span>Event Collections</span>
+                <h2 id="eventTotal">₹0</h2>
+                <p>Advance amount received for events</p>
+            </article>
+
+            <article class="summary-card">
+                <span>Total Expenses</span>
+                <h2 id="expenseTotal">₹0</h2>
+                <p>Total Amount Paid for Expenses</p>
+            </article>
+
+            <article class="summary-card">
+                <span>Pending Payments</span>
+                <h2 id="pendingTotal">₹0</h2>
+                <p>Auction Payment And Payment Collections</p>
+            </article>
+
+            <article class="summary-card balance-card">
+                <span>Available Balance</span>
+                <h2 id="balanceTotal">₹0</h2>
+                <p>Income received minus expenses paid</p>
+            </article>
+        </section>
+
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+                <div>
+                    <h2>Recent Transactions</h2>
+                    <p>Latest recorded financial activity</p>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Transaction</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTable">
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                No transactions recorded yet.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+                <div>
+                    <h2>Quick Actions</h2>
+                    <p>Access common management tasks</p>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <a href="events.html">+ Create Event</a>
+                <a href="chanda.html">+ Record Chanda</a>
+                <a href="auctions.html">+ Add Auction</a>
+                <a href="expenses.html">+ Add Expense</a>
+            </div>
+        </section>
+
+        <footer class="dashboard-footer">
+            © 2026 Chatrapathi Shivaji Youth Management System
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        const menuToggle = document.getElementById("menuToggle");
+        const sidebar = document.getElementById("sidebar");
+
+        menuToggle.addEventListener("click", function () {
+            sidebar.classList.toggle("sidebar-open");
+        });
+    </script>
+    
+<script>
+function readRecords(key) {
+    try {
+        const data = JSON.parse(localStorage.getItem(key) || "[]");
+        return Array.isArray(data) ? data : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function money(amount) {
+    return "₹" + Number(amount || 0).toLocaleString("en-IN", {
+        maximumFractionDigits: 2
+    });
+}
+
+function updateDashboard() {
+    const chanda = readRecords("shivajiChanda");
+    const auctions = readRecords("shivajiAuctions");
+    const events = readRecords("shivajiEvents");
+    const expenses = readRecords("shivajiExpenses");
+    const payments = readRecords("shivajiPayments");
+
+    const chandaReceived = chanda.reduce(
+        (total, item) => total + Number(item.amount || 0), 0
+    );
+
+    const auctionReceived = auctions.reduce(
+        (total, item) => total + Number(item.received || 0), 0
+    );
+
+    const eventAdvances = events.reduce(
+        (total, item) => total + Number(item.advance || 0), 0
+    );
+
+    const expensesPaid = expenses.reduce(
+        (total, item) => total + Number(item.paid || 0), 0
+    );
+
+    const paymentsReceived = payments.reduce(
+        (total, item) => total + Number(item.received || 0), 0
+    );
+
+    const auctionPending = auctions.reduce(
+        (total, item) => total + Math.max(
+            0, Number(item.bid || 0) - Number(item.received || 0)
+        ), 0
+    );
+
+    const paymentPending = payments.reduce(
+        (total, item) => total + Math.max(
+            0, Number(item.due || 0) - Number(item.received || 0)
+        ), 0
+    );
+
+    document.getElementById("chandaTotal").textContent =
+        money(chandaReceived);
+
+    document.getElementById("auctionTotal").textContent =
+        money(auctionReceived);
+
+    document.getElementById("eventTotal").textContent =
+        money(eventAdvances);
+
+    document.getElementById("expenseTotal").textContent =
+        money(expensesPaid);
+
+    document.getElementById("pendingTotal").textContent =
+        money(auctionPending + paymentPending);
+
+    const balance = chandaReceived + auctionReceived +
+        eventAdvances + paymentsReceived - expensesPaid;
+
+    document.getElementById("balanceTotal").textContent =
+        money(balance);
+
+    updateRecentTransactions(chanda, auctions, events, expenses, payments);
+}
+
+function updateRecentTransactions(chanda, auctions, events, expenses, payments) {
+    const transactions = [];
+
+    chanda.forEach(item => {
+        transactions.push({
+            date: item.date || "",
+            title: item.name || "Chanda Contribution",
+            type: "Chanda",
+            amount: Number(item.amount || 0),
+            status: "Received"
+        });
+    });
+
+    auctions.forEach(item => {
+        if (Number(item.received || 0) > 0) {
+            transactions.push({
+                date: item.date || "",
+                title: item.item || item.bidder || "Auction",
+                type: "Auction Payment",
+                amount: Number(item.received || 0),
+                status: "Received"
+            });
+        }
+    });
+
+    events.forEach(item => {
+        if (Number(item.advance || 0) > 0) {
+            transactions.push({
+                date: item.date || "",
+                title: item.name || "Event Advance",
+                type: "Event Advance",
+                amount: Number(item.advance || 0),
+                status: "Received"
+            });
+        }
+    });
+
+    expenses.forEach(item => {
+        if (Number(item.paid || 0) > 0) {
+            transactions.push({
+                date: item.date || "",
+                title: item.title || "Expense",
+                type: item.category || "Expense",
+                amount: Number(item.paid || 0),
+                status: "Paid"
+            });
+        }
+    });
+
+    payments.forEach(item => {
+        if (Number(item.received || 0) > 0) {
+            transactions.push({
+                date: item.date || "",
+                title: item.name || "Payment",
+                type: item.purpose || "Payment Record",
+                amount: Number(item.received || 0),
+                status: "Received"
+            });
+        }
+    });
+
+    transactions.sort((a, b) => b.date.localeCompare(a.date));
+
+    const table = document.getElementById("transactionTable");
+    if (!table) return;
+
+    table.replaceChildren();
+
+    if (transactions.length === 0) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+
+        cell.colSpan = 5;
+        cell.textContent = "No transactions recorded yet.";
+        cell.className = "empty-state";
+
+        row.appendChild(cell);
+        table.appendChild(row);
+        return;
+    }
+
+    transactions.slice(0, 10).forEach(item => {
+        const row = document.createElement("tr");
+
+        [
+            item.date || "—",
+            item.title,
+            item.type,
+            money(item.amount),
+            item.status
+        ].forEach(value => {
+            const cell = document.createElement("td");
+            cell.textContent = value;
+            row.appendChild(cell);
+        });
+
+        table.appendChild(row);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", updateDashboard);
+
+// Update the dashboard when another browser tab changes saved records.
+window.addEventListener("storage", updateDashboard);
+</script>
+</body>
+</html>
+

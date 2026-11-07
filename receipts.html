@@ -1,0 +1,509 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Receipts | Shivaji Youth 2026</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .receipt-layout {
+            display: grid;
+            grid-template-columns: minmax(280px, 1fr) minmax(300px, 1fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .receipt-form, .receipt-paper {
+            background: white;
+            padding: 25px;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 5px 20px #1720330b;
+        }
+
+        .receipt-form h2, .receipt-paper h2 {
+            margin-bottom: 20px;
+        }
+
+        .receipt-form form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .receipt-form label {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 7px;
+        }
+
+        .receipt-form input, .receipt-form select,
+        .receipt-form textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #d5dbe5;
+            border-radius: 7px;
+            font: inherit;
+        }
+
+        .receipt-form button, .receipt-actions button {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .generate-btn {
+            background: #e99519;
+            color: #172033;
+            margin-top: 12px;
+        }
+
+        .receipt-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .print-btn {
+            background: #101b32;
+            color: white;
+        }
+
+        .clear-btn {
+            background: #e8edf5;
+            color: #172033;
+        }
+
+        .receipt-paper {
+            border: 2px dashed #d5dbe5;
+        }
+
+        .receipt-header {
+            text-align: center;
+            border-bottom: 2px solid #e99519;
+            padding-bottom: 18px;
+            margin-bottom: 20px;
+        }
+
+        .receipt-logo {
+            font-size: 38px;
+            margin-bottom: 8px;
+        }
+
+        .receipt-header h2 {
+            margin-bottom: 6px;
+            color: #101b32;
+        }
+
+        .receipt-header p, .receipt-muted {
+            color: #667085;
+            font-size: 13px;
+        }
+
+        .receipt-number {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+            background: #fff5e5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 13px;
+        }
+
+        .receipt-details {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .receipt-details td {
+            padding: 12px 5px;
+            border-bottom: 1px solid #edf0f5;
+            vertical-align: top;
+            overflow-wrap: anywhere;
+        }
+
+        .receipt-details td:first-child {
+            color: #667085;
+            width: 42%;
+        }
+
+        .receipt-amount {
+            background: #f3f7ff;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .receipt-amount span {
+            color: #667085;
+            font-size: 13px;
+        }
+
+        .receipt-amount h2 {
+            color: #176b49;
+            margin: 8px 0 0;
+        }
+
+        .receipt-footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 18px;
+            border-top: 1px solid #e5e9f1;
+            font-size: 12px;
+            color: #667085;
+        }
+
+        .receipt-message {
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        @media(max-width: 800px) {
+            .receipt-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+
+            #receiptPaper, #receiptPaper * {
+                visibility: visible !important;
+            }
+
+            #receiptPaper {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+                border: 1px solid #bbb;
+                padding: 25px;
+                color: black;
+            }
+
+            .receipt-actions, .no-print {
+                display: none !important;
+            }
+
+            @page {
+                size: A4;
+                margin: 15mm;
+            }
+        }
+    </style>
+</head>
+
+<body class="dashboard-body">
+
+    <aside class="sidebar">
+        <h2>🟠 Shivaji Youth</h2>
+        <p class="sidebar-subtitle">2026 Management System</p>
+
+        <nav class="side-nav">
+            <a href="admin-dashboard.html">Dashboard</a>
+            <a href="events.html">Events</a>
+            <a href="members.html">Members</a>
+            <a href="chanda.html">Chanda Collection</a>
+            <a href="auctions.html">Auctions</a>
+            <a href="expenses.html">Expenses</a>
+            <a href="payments.html">Payments</a>
+            <a href="reports.html">Reports</a>
+            <a href="receipts.html" class="active">Receipts</a>
+        </nav>
+
+        <a href="admin-login.html" class="logout-link">Back to Admin Login</a>
+    </aside>
+
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <div>
+                <h1>Payment Receipts</h1>
+                <p>Generate and print payment acknowledgements.</p>
+            </div>
+            <span class="admin-badge">Receipt Module</span>
+        </header>
+
+        <section class="receipt-layout">
+            <div class="receipt-form">
+                <h2>Receipt Details</h2>
+
+                <form id="receiptForm">
+                    <label for="receiptType">Payment Type</label>
+                    <select id="receiptType" required>
+                        <option value="Chanda">Chanda Contribution</option>
+                        <option value="Auction">Auction Payment</option>
+                        <option value="Event">Event Advance</option>
+                        <option value="Other">Other Payment</option>
+                    </select>
+
+                    <label for="receiptName">Received From</label>
+                    <input id="receiptName" type="text"
+                           maxlength="100" required
+                           placeholder="Enter member or payer name">
+
+                    <label for="receiptPhone">Phone Number (optional)</label>
+                    <input id="receiptPhone" type="tel"
+                           maxlength="20" placeholder="Enter phone number">
+
+                    <label for="receiptDate">Payment Date</label>
+                    <input id="receiptDate" type="date" required>
+
+                    <label for="receiptAmount">Amount Received (₹)</label>
+                    <input id="receiptAmount" type="number"
+                           min="0.01" max="100000000"
+                           step="0.01" required placeholder="Enter amount">
+
+                    <label for="receiptMethod">Payment Method</label>
+                    <select id="receiptMethod" required>
+                        <option value="Cash">Cash</option>
+                        <option value="UPI">UPI</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Cheque">Cheque</option>
+                        <option value="Other">Other</option>
+                    </select>
+
+                    <label for="receiptReference">Transaction Reference (optional)</label>
+                    <input id="receiptReference" type="text"
+                           maxlength="100" placeholder="UPI or bank reference">
+
+                    <label for="receiptNotes">Purpose / Notes (optional)</label>
+                    <textarea id="receiptNotes" rows="3"
+                              maxlength="250"
+                              placeholder="Enter payment purpose"></textarea>
+
+                    <button class="generate-btn" type="submit">
+                        Generate Receipt
+                    </button>
+                </form>
+
+                <p id="receiptMessage" class="receipt-message"
+                   role="status"></p>
+            </div>
+
+            <div>
+                <div class="receipt-paper" id="receiptPaper">
+                    <div class="receipt-header">
+                        <div class="receipt-logo">🟠</div>
+                        <h2>CHATRAPATHI SHIVAJI YOUTH</h2>
+                        <p>2026 Association Management</p>
+                        <p>PAYMENT RECEIPT</p>
+                    </div>
+
+                    <div class="receipt-number">
+                        <span>Receipt No: <strong id="outReceiptNo">—</strong></span>
+                        <span>Date: <strong id="outDate">—</strong></span>
+                    </div>
+
+                    <table class="receipt-details">
+                        <tr>
+                            <td>Received From</td>
+                            <td><strong id="outName">—</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Phone</td>
+                            <td id="outPhone">—</td>
+                        </tr>
+                        <tr>
+                            <td>Payment Type</td>
+                            <td id="outType">—</td>
+                        </tr>
+                        <tr>
+                            <td>Payment Method</td>
+                            <td id="outMethod">—</td>
+                        </tr>
+                        <tr>
+                            <td>Transaction Reference</td>
+                            <td id="outReference">—</td>
+                        </tr>
+                        <tr>
+                            <td>Purpose / Notes</td>
+                            <td id="outNotes">—</td>
+                        </tr>
+                    </table>
+
+                    <div class="receipt-amount">
+                        <span>Amount Received</span>
+                        <h2 id="outAmount">₹0.00</h2>
+                    </div>
+
+                    <div class="receipt-footer">
+                        <p>Thank you for your contribution!</p>
+                        <p>This receipt acknowledges the amount entered above.</p>
+                        <p>Authorized Signature: __________________</p>
+                    </div>
+                </div>
+
+                <div class="receipt-actions">
+                    <button type="button" class="print-btn"
+                            id="printReceipt" disabled>
+                        Print / Save as PDF
+                    </button>
+
+                    <button type="button" class="clear-btn"
+                            id="clearReceipt">
+                        Clear Form
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const form = document.getElementById("receiptForm");
+        const message = document.getElementById("receiptMessage");
+        const printButton = document.getElementById("printReceipt");
+        const dateInput = document.getElementById("receiptDate");
+
+        let currentReceipt = null;
+
+        // Use the browser's local calendar date.
+        const now = new Date();
+        const localDate = new Date(
+            now.getTime() - now.getTimezoneOffset() * 60000
+        ).toISOString().slice(0, 10);
+
+        dateInput.value = localDate;
+
+        function display(id, value) {
+            document.getElementById(id).textContent = value || "—";
+        }
+
+        function formatMoney(value) {
+            return "₹" + Number(value).toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function formatDate(value) {
+            if (!value) return "—";
+
+            const parts = value.split("-");
+            if (parts.length !== 3) return value;
+
+            return parts[2] + "-" + parts[1] + "-" + parts[0];
+        }
+
+        function generateReceiptNumber() {
+            const key = "shivajiReceiptSequence";
+            let sequence = 0;
+
+            try {
+                sequence = Number(localStorage.getItem(key) || "0");
+
+                if (!Number.isSafeInteger(sequence) || sequence < 0) {
+                    sequence = 0;
+                }
+
+                if (sequence >= Number.MAX_SAFE_INTEGER) {
+                    throw new Error("Receipt sequence limit reached.");
+                }
+
+                sequence++;
+                localStorage.setItem(key, String(sequence));
+
+                return "CSY26-" + String(sequence).padStart(5, "0");
+            } catch (error) {
+                throw new Error(
+                    "Could not save the receipt number in this browser."
+                );
+            }
+        }
+
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById("receiptName").value.trim();
+            const phone = document.getElementById("receiptPhone").value.trim();
+            const type = document.getElementById("receiptType").value;
+            const date = dateInput.value;
+            const amount = Number(
+                document.getElementById("receiptAmount").value
+            );
+            const method = document.getElementById("receiptMethod").value;
+            const reference = document.getElementById("receiptReference").value.trim();
+            const notes = document.getElementById("receiptNotes").value.trim();
+
+            if (!name || !date || !Number.isFinite(amount) ||
+                amount <= 0 || amount > 100000000) {
+                message.textContent = "Please enter valid receipt details.";
+                return;
+            }
+
+            let receiptNo;
+
+            try {
+                receiptNo = generateReceiptNumber();
+            } catch (error) {
+                message.textContent = error.message;
+                return;
+            }
+
+            currentReceipt = {
+                receiptNo,
+                name,
+                phone,
+                type,
+                date,
+                amount,
+                method,
+                reference,
+                notes
+            };
+
+            display("outReceiptNo", receiptNo);
+            display("outDate", formatDate(date));
+            display("outName", name);
+            display("outPhone", phone);
+            display("outType", type);
+            display("outMethod", method);
+            display("outReference", reference);
+            display("outNotes", notes);
+            display("outAmount", formatMoney(amount));
+
+            printButton.disabled = false;
+            message.textContent =
+                "Receipt generated. Check the details before printing.";
+        });
+
+        printButton.addEventListener("click", function() {
+            if (!currentReceipt) {
+                message.textContent = "Generate a receipt first.";
+                return;
+            }
+
+            window.print();
+        });
+
+        document.getElementById("clearReceipt").addEventListener("click", function() {
+            form.reset();
+            dateInput.value = localDate;
+            currentReceipt = null;
+
+            display("outReceiptNo", "—");
+            display("outDate", "—");
+            display("outName", "—");
+            display("outPhone", "—");
+            display("outType", "—");
+            display("outMethod", "—");
+            display("outReference", "—");
+            display("outNotes", "—");
+            display("outAmount", "₹0.00");
+
+            printButton.disabled = true;
+            message.textContent = "";
+        });
+    </script>
+
+</body>
+</html>

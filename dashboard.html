@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Shivaji Youth 2026</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-body">
+
+    <aside class="sidebar">
+        <h2>Shivaji Youth</h2>
+        <p>Management Portal</p>
+
+        <nav>
+            <a href="dashboard.html" class="active">Dashboard</a>
+            <a href="members.html">Members Management</a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <div>
+                <p class="dashboard-label">SHIVAJI YOUTH 2026</p>
+                <h1>Dashboard</h1>
+                <p>Welcome to your association management portal.</p>
+            </div>
+            <a href="members.html" class="primary-btn">
+                Manage Members
+            </a>
+        </header>
+
+        <section class="dashboard-stats">
+            <article class="dashboard-card">
+                <p>Total Members</p>
+                <h2 id="totalMembers">0</h2>
+            </article>
+
+            <article class="dashboard-card">
+                <p>Active Members</p>
+                <h2 id="activeMembers">0</h2>
+            </article>
+
+            <article class="dashboard-card">
+                <p>Inactive Members</p>
+                <h2 id="inactiveMembers">0</h2>
+            </article>
+
+            <article class="dashboard-card">
+                <p>Leadership Roles</p>
+                <h2 id="leadershipRoles">0</h2>
+            </article>
+        </section>
+
+        <section class="dashboard-panel">
+            <h2>Recent Registrations</h2>
+             
+<section class="dashboard-charts">
+    <div class="dashboard-panel chart-panel">
+        <h2>Membership Status</h2>
+
+        <div class="status-chart-container">
+            <div id="statusDonut" class="status-donut">
+                <div class="donut-center">
+                    <strong id="chartTotal">0</strong>
+                    <span>Members</span>
+                </div>
+            </div>
+
+            <div class="chart-legend">
+                <p>
+                    <span class="legend-dot active-dot"></span>
+                    Active
+                    <strong id="chartActive">0</strong>
+                </p>
+
+                <p>
+                    <span class="legend-dot inactive-dot"></span>
+                    Inactive
+                    <strong id="chartInactive">0</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-panel chart-panel">
+        <h2>Members by Role</h2>
+
+        <div id="roleChart" class="role-chart">
+            <p>Loading role statistics...</p>
+        </div>
+    </div>
+</section>
+
+
+            <div class="dashboard-table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Member ID</th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentMembers">
+                        <tr>
+                            <td colspan="4">Loading members...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

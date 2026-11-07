@@ -1,0 +1,456 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Contribution History | Shivaji Youth 2026</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .history-panel {
+            background: white;
+            border: 1px solid #e5e9f1;
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .search-row input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px;
+            border: 1px solid #d5dbe5;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .search-row button {
+            padding: 12px 18px;
+            background: #e99519;
+            color: #172033;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .history-summary {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .history-stat {
+            background: white;
+            border: 1px solid #e5e9f1;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .history-stat span {
+            font-size: 13px;
+            color: #68758a;
+        }
+
+        .history-stat h2 {
+            margin-top: 10px;
+            overflow-wrap: anywhere;
+            font-size: 23px;
+        }
+
+        .history-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .history-table th, .history-table td {
+            padding: 13px 10px;
+            border-bottom: 1px solid #edf0f5;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .history-table th {
+            background: #f7f8fc;
+            color: #58657a;
+        }
+
+        .history-status {
+            display: inline-block;
+            padding: 5px 9px;
+            background: #e2f7eb;
+            color: #176b49;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .history-empty {
+            text-align: center;
+            color: #758096;
+            padding: 28px !important;
+        }
+
+        .history-message {
+            margin-top: 12px;
+            color: #58657a;
+            font-size: 14px;
+        }
+
+        .print-history {
+            margin-top: 16px;
+            padding: 11px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #101b32;
+            color: white;
+            cursor: pointer;
+        }
+
+        @media(max-width: 800px) {
+            .history-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .history-panel {
+                padding: 16px;
+            }
+        }
+
+        @media print {
+            .sidebar, .no-print, .search-panel, .dashboard-footer {
+                display: none !important;
+            }
+
+            .dashboard-main {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            body {
+                background: white !important;
+            }
+
+            .history-panel, .history-stat {
+                box-shadow: none !important;
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body class="dashboard-body">
+
+    <aside class="sidebar">
+        <h2>🟠 Shivaji Youth</h2>
+        <p class="sidebar-subtitle">2026 Management System</p>
+
+        <nav class="side-nav">
+            <a href="admin-dashboard.html">Dashboard</a>
+            <a href="events.html">Events</a>
+            <a href="members.html">Members</a>
+            <a href="member-history.html" class="active">Member History</a>
+            <a href="chanda.html">Chanda Collection</a>
+            <a href="auctions.html">Auctions</a>
+            <a href="expenses.html">Expenses</a>
+            <a href="payments.html">Payments</a>
+            <a href="reports.html">Reports</a>
+            <a href="receipts.html">Receipts</a>
+        </nav>
+
+        <a href="admin-login.html" class="logout-link">Back to Admin Login</a>
+    </aside>
+
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <div>
+                <h1>Member Contribution History</h1>
+                <p>Search for a member to view their recorded payments.</p>
+            </div>
+            <span class="admin-badge">Member Records</span>
+        </header>
+
+        <section class="history-panel search-panel">
+            <h2>Search Member</h2>
+            <p>Search by member name, phone number, or email.</p>
+
+            <div class="search-row">
+                <input type="text" id="memberSearch"
+                       placeholder="Enter name, phone, or email"
+                       autocomplete="off">
+                <button type="button" id="searchButton">Search</button>
+                <button type="button" id="showAllButton">Show All</button>
+            </div>
+
+            <p id="historyMessage" class="history-message" role="status"></p>
+        </section>
+
+        <section class="history-summary">
+            <article class="history-stat">
+                <span>Member</span>
+                <h2 id="historyMember">—</h2>
+            </article>
+
+            <article class="history-stat">
+                <span>Total Recorded Received</span>
+                <h2 id="historyReceived">₹0</h2>
+            </article>
+
+            <article class="history-stat">
+                <span>Number of Records</span>
+                <h2 id="historyCount">0</h2>
+            </article>
+        </section>
+
+        <section class="history-panel">
+            <h2>Payment History</h2>
+            <p class="history-message">
+                Shows received amounts from Chanda, Auctions, Event Advances,
+                and Payments records. Avoid entering the same payment in multiple modules.
+            </p>
+
+            <div class="history-table-wrapper">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Member / Payer</th>
+                            <th>Type</th>
+                            <th>Purpose / Item</th>
+                            <th>Method</th>
+                            <th>Amount Received</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTable">
+                        <tr>
+                            <td colspan="6" class="history-empty">
+                                Enter a search term to view records.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <button type="button" id="printHistory"
+                    class="print-history no-print">
+                Print / Save History as PDF
+            </button>
+        </section>
+
+        <footer class="dashboard-footer">
+            Chatrapathi Shivaji Youth 2026 Management System
+        </footer>
+    </main>
+
+    <script>
+        const searchInput = document.getElementById("memberSearch");
+        const searchButton = document.getElementById("searchButton");
+        const showAllButton = document.getElementById("showAllButton");
+        const table = document.getElementById("historyTable");
+        const message = document.getElementById("historyMessage");
+
+        let currentRecords = [];
+        let currentMember = "All Members";
+
+        function readRecords(key) {
+            try {
+                const value = JSON.parse(localStorage.getItem(key) || "[]");
+                return Array.isArray(value) ? value : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function money(value) {
+            return "₹" + Number(value || 0).toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function buildRecords() {
+            const records = [];
+
+            readRecords("shivajiChanda").forEach(item => {
+                records.push({
+                    date: item.date || "",
+                    name: item.name || "",
+                    phone: item.phone || "",
+                    email: item.email || "",
+                    type: "Chanda",
+                    purpose: item.purpose || "Chanda Contribution",
+                    method: item.method || "—",
+                    amount: Number(item.amount || 0)
+                });
+            });
+
+            readRecords("shivajiAuctions").forEach(item => {
+                const amount = Number(item.received || 0);
+
+                if (amount > 0) {
+                    records.push({
+                        date: item.date || "",
+                        name: item.bidder || "",
+                        phone: item.phone || "",
+                        email: "",
+                        type: "Auction Payment",
+                        purpose: item.item || "Auction",
+                        method: item.method || "—",
+                        amount
+                    });
+                }
+            });
+
+            readRecords("shivajiEvents").forEach(item => {
+                const amount = Number(item.advance || 0);
+
+                if (amount > 0) {
+                    records.push({
+                        date: item.date || "",
+                        name: item.memberName || item.name || "",
+                        phone: item.phone || "",
+                        email: item.email || "",
+                        type: "Event Advance",
+                        purpose: item.name || "Event",
+                        method: item.method || "—",
+                        amount
+                    });
+                }
+            });
+
+            readRecords("shivajiPayments").forEach(item => {
+                const amount = Number(item.received || 0);
+
+                if (amount > 0) {
+                    records.push({
+                        date: item.date || "",
+                        name: item.name || "",
+                        phone: item.phone || "",
+                        email: item.email || "",
+                        type: "Payment",
+                        purpose: item.purpose || "Payment Record",
+                        method: item.method || "—",
+                        amount
+                    });
+                }
+            });
+
+            return records;
+        }
+
+        function addCell(row, value) {
+            const cell = document.createElement("td");
+            cell.textContent = value || "—";
+            row.appendChild(cell);
+        }
+
+        function renderRecords(records, memberLabel) {
+            currentRecords = records;
+            currentMember = memberLabel;
+
+            document.getElementById("historyMember").textContent = memberLabel;
+            document.getElementById("historyCount").textContent = records.length;
+
+            const total = records.reduce(
+                (sum, item) => sum + Number(item.amount || 0), 0
+            );
+
+            document.getElementById("historyReceived").textContent = money(total);
+            table.replaceChildren();
+
+            if (records.length === 0) {
+                const row = document.createElement("tr");
+                const cell = document.createElement("td");
+                cell.colSpan = 6;
+                cell.className = "history-empty";
+                cell.textContent = "No matching payment records found.";
+                row.appendChild(cell);
+                table.appendChild(row);
+                return;
+            }
+
+            records.slice().sort((a, b) =>
+                b.date.localeCompare(a.date)
+            ).forEach(item => {
+                const row = document.createElement("tr");
+                addCell(row, item.date);
+                addCell(row, item.name);
+                addCell(row, item.type);
+                addCell(row, item.purpose);
+                addCell(row, item.method);
+                addCell(row, money(item.amount));
+                table.appendChild(row);
+            });
+        }
+
+        function searchMembers() {
+            const query = searchInput.value.trim().toLowerCase();
+
+            if (!query) {
+                message.textContent =
+                    "Enter a member name, phone number, or email to search.";
+                return;
+            }
+
+            const matches = buildRecords().filter(item =>
+                item.name.toLowerCase().includes(query) ||
+                item.phone.toLowerCase().includes(query) ||
+                item.email.toLowerCase().includes(query)
+            );
+
+            renderRecords(matches, searchInput.value.trim());
+            message.textContent = matches.length
+                ? "Found " + matches.length + " matching payment record(s)."
+                : "No matching records found. Check the spelling or try a phone number.";
+        }
+
+        searchButton.addEventListener("click", searchMembers);
+
+        searchInput.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                searchMembers();
+            }
+        });
+
+        showAllButton.addEventListener("click", function() {
+            searchInput.value = "";
+            const records = buildRecords();
+            renderRecords(records, "All Members");
+            message.textContent = "Showing all recorded payment entries.";
+        });
+
+        document.getElementById("printHistory").addEventListener("click", function() {
+            if (currentRecords.length === 0) {
+                message.textContent = "There are no records to print.";
+                return;
+            }
+
+            window.print();
+        });
+
+        window.addEventListener("storage", function() {
+            if (searchInput.value.trim()) {
+                searchMembers();
+            } else if (currentMember === "All Members") {
+                renderRecords(buildRecords(), "All Members");
+            }
+        });
+
+        renderRecords([], "—");
+    </script>
+
+</body>
+</html>

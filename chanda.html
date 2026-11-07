@@ -1,0 +1,285 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chanda Collections | Shivaji Youth 2026</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-body">
+
+    <aside class="sidebar">
+        <h2>🟠 Shivaji Youth</h2>
+        <p class="sidebar-subtitle">Management System</p>
+
+        <nav class="side-nav">
+            <a href="admin-dashboard.html">📊 Dashboard</a>
+            <a href="events.html">🎉 Events</a>
+            <a href="members.html">👥 Members</a>
+            <a class="active" href="chanda.html">💰 Chanda Collections</a>
+            <a href="auctions.html">🔨 Auctions</a>
+            <a href="expenses.html">🧾 Expenses</a>
+            <a href="payments.html">💳 Payments</a>
+            <a href="reports.html">📈 Reports</a>
+        </nav>
+
+        <a class="logout-link" href="admin-login.html">↩ Logout</a>
+    </aside>
+
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <div>
+                <h1>Chanda Collections</h1>
+                <p>Record and manage member contributions.</p>
+            </div>
+            <span class="admin-badge">Administrator</span>
+        </header>
+
+        <section class="summary-grid">
+            <article class="summary-card">
+                <span>Total Contributions</span>
+                <h2 id="contributionCount">0</h2>
+            </article>
+            <article class="summary-card">
+                <span>Total Chanda Received</span>
+                <h2 id="chandaAmount">₹0</h2>
+            </article>
+            <article class="summary-card">
+                <span>Cash Received</span>
+                <h2 id="cashAmount">₹0</h2>
+            </article>
+            <article class="summary-card">
+                <span>Online Received</span>
+                <h2 id="onlineAmount">₹0</h2>
+            </article>
+        </section>
+
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+                <h2>Record New Contribution</h2>
+                <p>Only enter amounts that have actually been received.</p>
+            </div>
+
+            
+<form id="chandaForm" class="chanda-form-horizontal">
+
+    <div class="chanda-form-field">
+        <label for="contributorName">Contributor Name</label>
+        <input id="contributorName" type="text"
+               placeholder="Enter contributor name" required>
+    </div>
+
+    <div class="chanda-form-field">
+        <label for="contributorPhone">Phone Number (optional)</label>
+        <input id="contributorPhone" type="tel"
+               placeholder="Enter phone number">
+    </div>
+
+    <div class="chanda-form-field">
+        <label for="contributionDate">Contribution Date</label>
+        <input id="contributionDate" type="date" required>
+    </div>
+
+    <div class="chanda-form-field">
+        <label for="contributionAmount">Amount Received (₹)</label>
+        <input id="contributionAmount" type="number"
+               min="0.01" step="0.01"
+               placeholder="Enter amount" required>
+    </div>
+
+    <div class="chanda-form-field">
+        <label for="paymentMethod">Payment Method</label>
+        <select id="paymentMethod" required>
+            <option value="">Select payment method</option>
+            <option value="Cash">Cash</option>
+            <option value="UPI">UPI</option>
+            <option value="Bank Transfer">Bank Transfer</option>
+            <option value="Other">Other</option>
+        </select>
+    </div>
+
+    <div class="chanda-form-field">
+        <label for="contributionPurpose">Purpose</label>
+        <select id="contributionPurpose" required>
+            <option value="">Select purpose</option>
+            <option value="General Fund">General Fund</option>
+            <option value="Festival">Festival</option>
+            <option value="Pooja">Pooja</option>
+            <option value="Annadanam">Annadanam</option>
+            <option value="Community Service">Community Service</option>
+            <option value="Other">Other</option>
+        </select>
+    </div>
+
+    <div class="chanda-form-field">
+        <label for="contributionNotes">Notes (optional)</label>
+        <textarea id="contributionNotes" rows="2"
+                  placeholder="Additional details"></textarea>
+    </div>
+
+    <div class="chanda-form-actions">
+        <button type="submit" class="primary-btn">
+            Save Contribution
+        </button>
+    </div>
+
+    <p id="chandaMessage" class="form-message"></p>
+
+</form>
+
+        </section>
+
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+                <h2>Contribution History</h2>
+                <p>All recorded contributions are shown below.</p>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Receipt No.</th>
+                            <th>Date</th>
+                            <th>Contributor</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Purpose</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="chandaTable">
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                No contributions recorded yet.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const chandaForm = document.getElementById("chandaForm");
+        const chandaTable = document.getElementById("chandaTable");
+        const chandaMessage = document.getElementById("chandaMessage");
+
+        let contributions = JSON.parse(
+            localStorage.getItem("shivajiChanda") || "[]"
+        );
+
+        function formatMoney(amount) {
+            return "₹" + amount.toLocaleString("en-IN", {
+                maximumFractionDigits: 2
+            });
+        }
+
+        function safeText(value) {
+            return String(value ?? "").replace(/[&<>"']/g, ch => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[ch]);
+        }
+
+        function renderChanda() {
+            const total = contributions.reduce(
+                (sum, item) => sum + item.amount, 0
+            );
+
+            const cash = contributions
+                .filter(item => item.method === "Cash")
+                .reduce((sum, item) => sum + item.amount, 0);
+
+            const online = contributions
+                .filter(item => ["UPI", "Bank Transfer"].includes(item.method))
+                .reduce((sum, item) => sum + item.amount, 0);
+
+            document.getElementById("contributionCount").textContent =
+                contributions.length;
+            document.getElementById("chandaAmount").textContent =
+                formatMoney(total);
+            document.getElementById("cashAmount").textContent =
+                formatMoney(cash);
+            document.getElementById("onlineAmount").textContent =
+                formatMoney(online);
+
+            if (contributions.length === 0) {
+                chandaTable.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            No contributions recorded yet.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            chandaTable.innerHTML = contributions.map((item, index) => `
+                <tr>
+                    <td>CH-${String(index + 1).padStart(4, "0")}</td>
+                    <td>${safeText(item.date)}</td>
+                    <td>${safeText(item.name)}</td>
+                    <td>${formatMoney(item.amount)}</td>
+                    <td>${safeText(item.method)}</td>
+                    <td>${safeText(item.purpose)}</td>
+                    <td>
+                        <button type="button" onclick="deleteContribution(${index})">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            `).join("");
+        }
+
+        chandaForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById("contributorName").value.trim();
+            const phone = document.getElementById("contributorPhone").value.trim();
+            const date = document.getElementById("contributionDate").value;
+            const amount = Number(
+                document.getElementById("contributionAmount").value
+            );
+            const method = document.getElementById("paymentMethod").value;
+            const purpose = document.getElementById("contributionPurpose").value;
+            const notes = document.getElementById("contributionNotes").value.trim();
+
+            if (!name || !date || !method || !purpose ||
+                !Number.isFinite(amount) || amount <= 0) {
+                chandaMessage.textContent =
+                    "Please enter valid contribution details.";
+                return;
+            }
+
+            contributions.push({
+                name, phone, date, amount, method, purpose, notes
+            });
+
+            localStorage.setItem(
+                "shivajiChanda", JSON.stringify(contributions)
+            );
+
+            chandaForm.reset();
+            chandaMessage.textContent = "Contribution saved successfully.";
+            renderChanda();
+        });
+
+        function deleteContribution(index) {
+            if (confirm("Delete this contribution record?")) {
+                contributions.splice(index, 1);
+                localStorage.setItem(
+                    "shivajiChanda", JSON.stringify(contributions)
+                );
+                renderChanda();
+                chandaMessage.textContent = "Contribution record deleted.";
+            }
+        }
+
+        renderChanda();
+    </script>
+</body>
+</html>

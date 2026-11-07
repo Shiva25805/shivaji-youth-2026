@@ -1,0 +1,22 @@
+
+# Local editor settings
+.vscode/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Local data and backups
+*.sql
+*.db
+*.sqlite
+*.bak
+*.backup
+
+# Logs
+*.log
+
+# Operating system files
+.DS_Store
+Thumbs.db

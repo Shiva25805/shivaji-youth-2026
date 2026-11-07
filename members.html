@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members | Shivaji Youth 2026</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon.ico">
+      
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+</head>
+<body class="dashboard-body">
+
+    <aside class="sidebar">
+        <h2>Shivaji Youth</h2>
+        <p class="sidebar-subtitle">Management System</p>
+
+        <nav class="side-nav">
+            <a href="admin-dashboard.html">📊 Dashboard</a>
+            <a href="events.html">🎉 Events</a>
+            <a class="active" href="members.html">👥 Members</a>
+            <a href="chanda.html">💰 Chanda Collections</a>
+            <a href="auctions.html">🔨 Auctions</a>
+            <a href="expenses.html">🧾 Expenses</a>
+            <a href="payments.html">💳 Payments</a>
+            <a href="reports.html">📈 Reports</a>
+        </nav>
+
+        <a class="logout-link" href="admin-login.html">↩ Logout</a>
+    </aside>
+       
+
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <div>
+                <h1>Members Management</h1>
+                <p>Register and manage association members.</p>
+            </div>
+            <span class="admin-badge">Administrator</span>
+        </header>
+
+        <section class="summary-grid">
+            <article class="summary-card">
+                <span>Total Members</span>
+                <h2 id="memberCount">0</h2>
+            </article>
+            <article class="summary-card">
+                <span>Active Members</span>
+                <h2 id="activeCount">0</h2>
+            </article>
+            <article class="summary-card">
+                <span>Inactive Members</span>
+                <h2 id="inactiveCount">0</h2>
+            </article>
+        </section>
+        
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+                <h2>Register New Member</h2>
+                <button type="button" id="resetMemberForm">Reset Form</button>
+                <p>Add a member to the association records.</p>
+            </div>
+            
+            
+
+            <form id="memberForm">
+                <label for="memberName">Full Name</label>
+                <input id="memberName" type="text"
+                       placeholder="Enter full name" required>
+
+                <label for="memberPhone">Phone Number</label>
+                <input id="memberPhone" type="tel"
+                       placeholder="Enter phone number" required>
+                       
+
+                <label for="memberEmail">Email (optional)</label>
+                <input id="memberEmail" type="email"
+                       placeholder="Enter email address">
+
+                <label for="memberRole">Role</label>
+                <select id="memberRole" required>
+                    <option value="">Select role</option>
+                    <option>President</option>
+                    <option>Vice President</option>
+                    <option>Secretary</option>
+                    <option>Treasurer</option>
+                    <option>Committee Member</option>
+                    <option>Member</option>
+                    <option>Volunteer</option>
+                </select>
+
+
+                <label for="memberStatus">Membership Status</label>
+                <select id="memberStatus" required>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+
+                <label for="memberAddress">Address (optional)</label>
+                <textarea id="memberAddress" rows="3"
+                          placeholder="Enter address"></textarea>
+
+                  <div class="form-actions">
+    <button type="submit" class="primary-btn">
+        Save Member
+    </button>
+
+    <button type="button" id="cancelEdit" class="primary-btn" hidden>
+        Cancel Edit
+    </button>
+</div>
+
+<p id="memberMessage" class="form-message"></p>
+
+                <p id="memberMessage" class="form-message"></p>
+            </form>
+        </section>
+
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+                <h2>Member Directory</h2>
+                 
+<div class="export-buttons">
+    <button type="button" id="exportCSV" class="export-btn">
+        Export CSV
+    </button>
+
+    <button type="button" id="exportExcel" class="export-btn">
+        Export Excel
+    </button>
+      <button type="button" id="downloadBackup" class="export-btn">
+    Download Backup
+</button>
+          
+<button type="button" id="restoreBackup" class="export-btn">
+    Restore Backup
+</button>
+
+<input
+    type="file"
+    id="backupFile"
+    accept=".json,application/json"
+    hidden
+>
+
+          
+</div>
+
+                  <select id="sortMembers">
+    <option value="az">Name: A to Z</option>
+    <option value="za">Name: Z to A</option>
+</select>
+                <p>Search members by name or phone number.</p>
+            </div>
+
+            <label for="memberSearch">Search Members</label>
+            <input id="memberSearch" type="search"
+                placeholder="Type a name or phone number">
+
+
+           <div class="filter-box">
+    <select id="memberStatusFilter">
+        <option value="all">All Members</option>
+        <option value="active">Active Members</option>
+        <option value="inactive">Inactive Members</option>
+    </select>
+</div>
+
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Member ID</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="memberTable">
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                No members registered yet.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination">
+    <button type="button" id="prevPage" class="primary-btn">
+        Previous
+    </button>
+
+    <span id="pageInfo">Page 1</span>
+
+    <button type="button" id="nextPage" class="primary-btn">
+        Next
+    </button>
+</div>
+</section>
+</main>
+
+
+<script>
+    const memberForm = document.getElementById("memberForm");
+    const memberTable = document.getElementById("memberTable");
+    const memberMessage = document.getElementById("memberMessage");
+    const memberSearch = document.getElementById("memberSearch");
+    const statusFilter = document.getElementById("memberStatusFilter");
+
+    const prevPage = document.getElementById("prevPage");
+    const nextPage = document.getElementById("nextPage");
+    const pageInfo = document.getElementById("pageInfo");
+
+    const membersPerPage = 10;
+let currentPage = 1;
+
+let members = [];
+
+async function loadMembers() {
+    try {
+        const response = await fetch("http://localhost:8080/api/members");
+
+        if (!response.ok) {
+            throw new Error("Failed to load members");
+        }
+
+        members = await response.json();
+        currentPage = 1;
+        renderMembers();
+
+    } catch (error) {
+        console.error("Error loading members:", error);
+        memberMessage.textContent =
+            "Could not load members. Please check whether the backend is running.";
+        memberMessage.style.color = "red";
+    }
+}
+
+
+    function safeText(value) {
+        return String(value ?? "").replace(/[&<>"']/g, ch => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[ch]);
+    }
+
+    function renderMembers() {
+    const search = memberSearch.value.trim().toLowerCase();
+
+    const selectedStatus = statusFilter
+        ? statusFilter.value
+        : "all";
+
+    // Filter members
+    const filtered = members
+        .map((member, index) => ({
+            ...member,
+            originalIndex: index
+        }))
+        .filter(member => {
+            const name = String(member.name ?? "").toLowerCase();
+            const phone = String(member.phone ?? "").toLowerCase();
+            const email = String(member.email ?? "").toLowerCase();
+            const status = String(member.status ?? "").toLowerCase();
+
+            const matchesSearch =
+                name.includes(search) ||
+                phone.includes(search) ||
+                email.includes(search);
+
+            const matchesStatus =
+                selectedStatus === "all" ||
+                status === selectedStatus;
+
+            return matchesSearch && matchesStatus;
+        });
+
+    // Sort members by name
+    const sortElement = document.getElementById("sortMembers");
+    const sortOrder = sortElement ? sortElement.value : "az";
+
+    filtered.sort((a, b) => {
+        const comparison = String(a.name ?? "").localeCompare(
+            String(b.name ?? "")
+        );
+
+        return sortOrder === "az" ? comparison : -comparison;
+    });
+
+    // Update summary counts
+    document.getElementById("memberCount").textContent = members.length;
+
+    document.getElementById("activeCount").textContent =
+        members.filter(member =>
+            String(member.status ?? "").toLowerCase() === "active"
+        ).length;
+
+    document.getElementById("inactiveCount").textContent =
+        members.filter(member =>
+            String(member.status ?? "").toLowerCase() === "inactive"
+        ).length;
+
+    // Calculate pagination
+    const totalPages = Math.max(
+        1,
+        Math.ceil(filtered.length / membersPerPage)
+    );
+
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
+
+    const startIndex = (currentPage - 1) * membersPerPage;
+
+    const pageMembers = filtered.slice(
+        startIndex,
+        startIndex + membersPerPage
+    );
+
+    // Display members in the table
+    if (pageMembers.length === 0) {
+        memberTable.innerHTML = `
+            <tr>
+                <td colspan="6" class="empty-state">
+                    No members found.
+                </td>
+            </tr>
+        `;
+    } else {
+        memberTable.innerHTML = pageMembers.map(member => `
+            <tr>
+                <td>${safeText(member.id ?? member.originalIndex + 1)}</td>
+                <td>${safeText(member.name)}</td>
+                <td>${safeText(member.phone)}</td>
+                <td>${safeText(member.role)}</td>
+                <td>${safeText(member.status)}</td>
+                 <td>
+    <button type="button"
+        onclick="viewMember(${member.originalIndex})">
+        View Details
+    </button>
+
+    <button type="button"
+        onclick="editMember(${member.originalIndex})">
+        Edit
+    </button>
+
+    <button type="button"
+        onclick="toggleMemberStatus(${member.originalIndex})">
+        Change Status
+    </button>
+
+    <button type="button"
+        onclick="deleteMember(${member.originalIndex})">
+        Delete
+    </button>
+</td>
+            </tr>
+        `).join("");
+    }
+
+    // Update pagination controls
+    pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+
+    prevPage.disabled = currentPage === 1;
+    nextPage.disabled = currentPage >= totalPages;
+}
+    
+
+function viewMember(index) {
+    const member = members[index];
+
+    if (!member) {
+        alert("Member not found.");
+        return;
+    }
+
+    const detailsContent = document.getElementById(
+        "memberDetailsContent"
+    );
+
+    const details = [
+        ["Member ID", member.id],
+        ["Full Name", member.name],
+        ["Phone Number", member.phone],
+        ["Email Address", member.email],
+        ["Role", member.role],
+        ["Status", member.status],
+        ["Address", member.address]
+    ];
+
+    detailsContent.innerHTML = details.map(([label, value]) => `
+        <div class="member-detail-row">
+            <div class="member-detail-label">
+                ${safeText(label)}
+            </div>
+            <div class="member-detail-value">
+                ${safeText(value || "N/A")}
+            </div>
+        </div>
+    `).join("");
+
+    document.getElementById("memberDetailsModal").style.display = "flex";
+}
+
+function closeMemberDetails() {
+    document.getElementById("memberDetailsModal").hidden = true;
+}
+
+
+function closeMemberDetails() {
+    document.getElementById("memberDetailsModal").hidden = true;
+}
+
+
+
+// Update summary counts
+    memberForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("memberName").value.trim();
+    const phone = document.getElementById("memberPhone").value.trim();
+    const memberEmail = document.getElementById("memberEmail").value.trim().toLowerCase();
+    const role = document.getElementById("memberRole").value;
+    const status = document.getElementById("memberStatus").value;
+    const address = document.getElementById("memberAddress").value.trim();
+
+    const editId = memberForm.dataset.editId;
+
+    if (!name || !phone || !role || !status) {
+        memberMessage.textContent = "Please complete all required fields.";
+        memberMessage.style.color = "red";
+        return;
+    }
+
+    if (!/^[0-9]{10}$/.test(phone)) {
+        memberMessage.textContent = "Please enter a valid 10-digit phone number.";
+        memberMessage.style.color = "red";
+        return;
+    }
+
+    if (memberEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(memberEmail)) {
+        memberMessage.textContent = "Please enter a valid email address.";
+        memberMessage.style.color = "red";
+        return;
+    }
+
+    const duplicateEmail = memberEmail && members.some(member =>
+        String(member.email ?? "").trim().toLowerCase() === memberEmail &&
+        String(member.id) !== String(editId)
+    );
+
+    if (duplicateEmail) {
+        memberMessage.textContent = "This email address is already registered.";
+        memberMessage.style.color = "red";
+        return;
+    }
+
+    const duplicatePhone = members.some(member =>
+        String(member.phone ?? "").trim() === phone &&
+        String(member.id) !== String(editId)
+    );
+
+    if (duplicatePhone) {
+        memberMessage.textContent = "This phone number is already registered.";
+        memberMessage.style.color = "red";
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            editId
+                ? `http://localhost:8080/api/members/${editId}`
+                : "http://localhost:8080/api/members",
+            {
+                method: editId ? "PUT" : "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name,
+                    phone,
+                    email: memberEmail,
+                    role,
+                    status,
+                    address
+                })
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Request failed: " + response.status);
+        }
+
+        memberForm.reset();
+        delete memberForm.dataset.editId;
+
+        document.getElementById("memberStatus").value = "Active";
+        document.querySelector("#memberForm button[type='submit']")
+            .textContent = "Save Member";
+
+        memberMessage.textContent = editId
+            ? "Member updated successfully."
+            : "Member registered successfully.";
+
+        memberMessage.style.color = "green";
+
+        currentPage = 1;
+        await loadMembers();
+
+    } catch (error) {
+        console.error("Error saving member:", error);
+        memberMessage.textContent = "Could not save member. Check the Console.";
+        memberMessage.style.color = "red";
+    }
+         
+});
+
+
+
+
+    memberSearch.addEventListener("input", function() {
+    currentPage = 1;
+    renderMembers();
+});
+     document.getElementById("sortMembers").addEventListener("change", function() {
+    currentPage = 1;
+    renderMembers();
+});
+
+if (statusFilter) {
+    statusFilter.addEventListener("change", function() {
+        currentPage = 1;
+        renderMembers();
+    });
+}
+
+  prevPage.addEventListener("click", function() {
+    if (currentPage > 1) {
+        currentPage--;
+        renderMembers();
+    }
+});
+
+nextPage.addEventListener("click", function() {
+    currentPage++;
+    renderMembers();
+});
+
+    
+async function toggleMemberStatus(index) {
+    const member = members[index];
+
+    if (!member || member.id == null) {
+        memberMessage.textContent = "Member ID not found.";
+        return;
+    }
+
+    const newStatus =
+        member.status === "Active" ? "Inactive" : "Active";
+
+    try {
+        const response = await fetch(
+            `http://localhost:8080/api/members/${member.id}/status`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ status: newStatus })
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Failed to update status.");
+        }
+
+        await loadMembers();
+        memberMessage.textContent = "Membership status updated successfully.";
+        memberMessage.style.color = "green";
+
+    } catch (error) {
+        console.error(error);
+        memberMessage.textContent = "Could not update membership status.";
+        memberMessage.style.color = "red";
+    }
+}
+
+     
+async function deleteMember(index) {
+    const member = members[index];
+
+    if (!member || member.id == null) {
+        memberMessage.textContent = "Member ID not found.";
+        return;
+    }
+
+    if (!confirm("Are you sure you want to delete this member?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            `http://localhost:8080/api/members/${member.id}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Failed to delete member.");
+        }
+
+        await loadMembers();
+        memberMessage.textContent = "Member deleted successfully.";
+        memberMessage.style.color = "green";
+
+    } catch (error) {
+        console.error(error);
+        memberMessage.textContent = "Could not delete member.";
+        memberMessage.style.color = "red";
+    }
+}
+            
+function viewMember(index) {
+    const member = members[index];
+
+    if (!member) {
+        alert("Member not found.");
+        return;
+    }
+
+    alert(
+        "MEMBER DETAILS\n\n" +
+        "ID: " + (member.id ?? "N/A") + "\n" +
+        "Name: " + (member.name ?? "N/A") + "\n" +
+        "Phone: " + (member.phone ?? "N/A") + "\n" +
+        "Email: " + (member.email || "N/A") + "\n" +
+        "Role: " + (member.role ?? "N/A") + "\n" +
+        "Status: " + (member.status ?? "N/A") + "\n" +
+        "Address: " + (member.address || "N/A")
+    );
+}
+
+         loadMembers();
+
+document.getElementById("resetMemberForm").addEventListener("click", function () {
+    if (confirm("Are you sure you want to clear all entered details?")) {
+        memberForm.reset();
+
+        delete memberForm.dataset.editId;
+
+        document.getElementById("memberStatus").value = "Active";
+
+        document.querySelector("#memberForm button[type='submit']")
+            .textContent = "Save Member";
+
+        document.getElementById("cancelEdit").hidden = true;
+
+        memberMessage.textContent = "Form cleared.";
+        memberMessage.style.color = "green";
+    }
+});
+
+document.getElementById("cancelEdit").addEventListener("click", function () {
+    memberForm.reset();
+
+    delete memberForm.dataset.editId;
+
+    document.getElementById("memberStatus").value = "Active";
+
+    document.querySelector("#memberForm button[type='submit']")
+        .textContent = "Save Member";
+
+    this.hidden = true;
+
+    memberMessage.textContent = "Edit cancelled.";
+    memberMessage.style.color = "blue";
+});
+          
+function exportMembersToCSV() {
+    const headers = [
+        "Member ID",
+        "Full Name",
+        "Phone Number",
+        "Email",
+        "Role",
+        "Status",
+        "Address"
+    ];
+
+    // Export all members matching the current search and filters,
+    // not only the current pagination page.
+    const searchText = document
+        .getElementById("memberSearch").value.trim().toLowerCase();
+
+    const selectedStatus = document
+        .getElementById("memberStatusFilter").value;
+
+    const sortOrder = document
+        .getElementById("sortMembers").value;
+
+    let filteredMembers = members.filter(member => {
+        const matchesSearch =
+            String(member.name ?? "").toLowerCase().includes(searchText) ||
+            String(member.phone ?? "").toLowerCase().includes(searchText);
+
+        const matchesStatus =
+            selectedStatus === "all" ||
+            String(member.status ?? "").toLowerCase() ===
+                selectedStatus.toLowerCase();
+
+        return matchesSearch && matchesStatus;
+    });
+
+    filteredMembers.sort((a, b) => {
+        const comparison = String(a.name ?? "")
+            .localeCompare(String(b.name ?? ""));
+
+        return sortOrder === "az" ? comparison : -comparison;
+    });
+
+    const escapeCSV = value =>
+        `"${String(value ?? "").replace(/"/g, '""')}"`;
+
+    const rows = [
+        headers,
+        ...filteredMembers.map(member => [
+            member.id,
+            member.name,
+            member.phone,
+            member.email,
+            member.role,
+            member.status,
+            member.address
+        ])
+    ];
+
+    const csvContent = "\uFEFF" +
+        rows.map(row => row.map(escapeCSV).join(",")).join("\r\n");
+
+    const blob = new Blob([csvContent], {
+        type: "text/csv;charset=utf-8;"
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "Shivaji_Youth_Members.csv";
+    link.click();
+
+    URL.revokeObjectURL(url);
+}
+
+document.getElementById("exportCSV").addEventListener(
+    "click",
+    exportMembersToCSV
+);
+       
+function exportMembersToExcel() {
+    if (typeof XLSX === "undefined") {
+        alert("Excel library failed to load. Check your internet connection.");
+        return;
+    }
+
+    const searchText = document
+        .getElementById("memberSearch").value.trim().toLowerCase();
+
+    const selectedStatus = document
+        .getElementById("memberStatusFilter").value;
+
+    const sortOrder = document
+        .getElementById("sortMembers").value;
+
+    let filteredMembers = members.filter(member => {
+        const matchesSearch =
+            String(member.name ?? "").toLowerCase().includes(searchText) ||
+            String(member.phone ?? "").toLowerCase().includes(searchText);
+
+        const matchesStatus =
+            selectedStatus === "all" ||
+            String(member.status ?? "").toLowerCase() ===
+                selectedStatus.toLowerCase();
+
+        return matchesSearch && matchesStatus;
+    });
+
+    filteredMembers.sort((a, b) => {
+        const comparison = String(a.name ?? "")
+            .localeCompare(String(b.name ?? ""));
+
+        return sortOrder === "az" ? comparison : -comparison;
+    });
+
+    const excelData = filteredMembers.map(member => ({
+        "Member ID": member.id ?? "",
+        "Full Name": member.name ?? "",
+        "Phone Number": member.phone ?? "",
+        "Email": member.email ?? "",
+        "Role": member.role ?? "",
+        "Status": member.status ?? "",
+        "Address": member.address ?? ""
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        "Members"
+    );
+
+    XLSX.writeFile(workbook, "Shivaji_Youth_Members.xlsx");
+}
+
+document.getElementById("exportExcel").addEventListener(
+    "click",
+    exportMembersToExcel
+);
+
+          
+async function downloadMembersBackup() {
+    try {
+        const response = await fetch("http://localhost:8080/api/members");
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch member records.");
+        }
+
+        const backupData = await response.json();
+
+        const backup = {
+            application: "Shivaji Youth 2026",
+            backupDate: new Date().toISOString(),
+            totalMembers: backupData.length,
+            members: backupData
+        };
+
+        const blob = new Blob(
+            [JSON.stringify(backup, null, 2)],
+            { type: "application/json;charset=utf-8" }
+        );
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        link.download = "Shivaji_Youth_Backup.json";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        URL.revokeObjectURL(url);
+
+        alert("Member backup downloaded successfully!");
+    } catch (error) {
+        console.error("Backup error:", error);
+        alert("Backup failed. Make sure the backend server is running.");
+    }
+}
+
+document.getElementById("downloadBackup").addEventListener(
+    "click",
+    downloadMembersBackup
+);
+      
+        
+document.getElementById("restoreBackup").addEventListener(
+    "click",
+    function () {
+        document.getElementById("backupFile").click();
+    }
+);
+
+document.getElementById("backupFile").addEventListener(
+    "change",
+    async function (event) {
+        const file = event.target.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        try {
+            const fileText = await file.text();
+            const backup = JSON.parse(fileText);
+
+            if (
+                backup.application !== "Shivaji Youth 2026" ||
+                !Array.isArray(backup.members) ||
+                !Number.isInteger(backup.totalMembers) ||
+                backup.totalMembers !== backup.members.length
+            ) {
+                throw new Error("Invalid backup file structure.");
+            }
+
+            
+            if (backup.members.length === 0) {
+                alert("This backup contains no members.");
+                return;
+            }
+
+            const confirmRestore = confirm(
+                "Backup file is valid.\n" +
+                "Members in backup: " + backup.members.length +
+                "\nBackup date: " + (backup.backupDate || "Unknown") +
+                "\n\nContinue restoring these members?"
+            );
+
+            if (!confirmRestore) {
+                return;
+            }
+
+            const response = await fetch(
+                "http://localhost:8080/api/members/restore",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(backup.members)
+                }
+            );
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(
+                    "Restore failed: " + errorText
+                );
+            }
+
+            const restoredMembers = await response.json();
+
+            alert(
+                "Restore completed!\n" +
+                "New members restored: " + restoredMembers.length
+            );
+
+            await loadMembers();
+
+        } catch (error) {
+            console.error("Backup validation error:", error);
+            alert("Invalid backup file. Please select a valid Shivaji Youth backup.");
+        } finally {
+            event.target.value = "";
+        }
+    }
+);
+              
+document.getElementById("closeMemberModal").addEventListener(
+    "click",
+    function () {
+        document.getElementById("memberDetailsModal").style.display = "none";
+    }
+);
+
+
+
+
+</script>
+
+    
+<!-- Member Details Modal -->
+<div id="memberDetailsModal" class="member-modal" hidden>
+    <div class="member-modal-overlay"
+         onclick="closeMemberDetails()"></div>
+
+    <div class="member-modal-content">
+        <div class="member-modal-header">
+            <div>
+                <p class="modal-eyebrow">SHIVAJI YOUTH 2026</p>
+                <h2>Member Details</h2>
+                <p class="modal-subtitle">Member profile information</p>
+            </div>
+
+            <button type="button"
+                    class="modal-close"
+                    onclick="closeMemberDetails()"
+                    aria-label="Close modal">
+                &times;
+            </button>
+        </div>
+
+        <div class="modal-member-identity">
+            <div class="modal-avatar" id="detailAvatar">M</div>
+            <div>
+                <h3 id="detailName">Member Name</h3>
+                <span id="detailStatus" class="modal-status">Active</span>
+            </div>
+        </div>
+
+        <div class="modal-details-grid">
+            <div class="modal-detail-item">
+                <span>Member ID</span>
+                <strong id="detailId">—</strong>
+            </div>
+
+            <div class="modal-detail-item">
+                <span>Role</span>
+                <strong id="detailRole">—</strong>
+            </div>
+
+            <div class="modal-detail-item">
+                <span>Phone Number</span>
+                <strong id="detailPhone">—</strong>
+            </div>
+
+            <div class="modal-detail-item">
+                <span>Email Address</span>
+                <strong id="detailEmail">—</strong>
+            </div>
+
+            <div class="modal-detail-item modal-address">
+                <span>Address</span>
+                <strong id="detailAddress">—</strong>
+            </div>
+        </div>
+
+        <div class="member-modal-footer">
+            <span class="modal-footer-label">MEMBER PROFILE</span>
+            <button type="button"
+                    class="modal-done-btn"
+                    onclick="closeMemberDetails()">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+             
+<div id="memberDetailsModal" class="member-modal" style="display: none;">
+    <div class="member-modal-content">
+        <div class="member-modal-header">
+            <h2>Member Details</h2>
+            <button
+                type="button"
+                id="closeMemberModal"
+                aria-label="Close member details"
+            >&times;</button>
+        </div>
+
+        <div id="memberDetailsContent" class="member-details-content"></div>
+    </div>
+</div>
+
+
+
+
+</body>
+</html>

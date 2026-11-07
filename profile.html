@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Shivaji Youth</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-page">
+
+    <div class="auth-card">
+        <a class="back-link" href="index.html">← Home</a>
+
+        <div class="auth-icon">👤</div>
+        <h1>My Profile</h1>
+        <p>Edit your member information.</p>
+
+        <form id="profileForm">
+            <label for="profileName">Full Name</label>
+            <input type="text" id="profileName"
+                   placeholder="Your full name" required>
+
+            <label for="profileEmail">Email</label>
+            <input type="email" id="profileEmail"
+                   placeholder="Your email address" required>
+
+            <label for="profilePhone">Phone Number</label>
+            <input type="tel" id="profilePhone"
+                   placeholder="10-digit phone number"
+                   pattern="[0-9]{10}" maxlength="10" required>
+
+            <label for="profileAddress">Address</label>
+            <input type="text" id="profileAddress"
+                   placeholder="Your address">
+
+            <button class="auth-button" type="submit">
+                Update Profile
+            </button>
+        </form>
+
+        <p id="profileMessage" class="form-message"
+           aria-live="polite"></p>
+    </div>
+
+    <script src="script.js"></script>
+
+<script>
+    const profileForm = document.getElementById("profileForm");
+
+    const profileFields = {
+        name: document.getElementById("profileName"),
+        email: document.getElementById("profileEmail"),
+        phone: document.getElementById("profilePhone"),
+        address: document.getElementById("profileAddress")
+    };
+
+    const profileMessage = document.getElementById("profileMessage");
+
+    function loadProfile() {
+        try {
+            const profile = JSON.parse(
+                localStorage.getItem("shivajiMemberProfile") || "{}"
+            );
+
+            profileFields.name.value = profile.name || "";
+            profileFields.email.value = profile.email || "";
+            profileFields.phone.value = profile.phone || "";
+            profileFields.address.value = profile.address || "";
+        } catch (error) {
+            profileMessage.textContent = "Could not load the saved profile.";
+        }
+    }
+
+    profileForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const profile = {
+            name: profileFields.name.value.trim(),
+            email: profileFields.email.value.trim(),
+            phone: profileFields.phone.value.trim(),
+            address: profileFields.address.value.trim()
+        };
+
+        if (!profile.name || !profile.email || !profile.phone) {
+            profileMessage.textContent =
+                "Please enter your name, email, and phone number.";
+            return;
+        }
+
+        try {
+            localStorage.setItem(
+                "shivajiMemberProfile",
+                JSON.stringify(profile)
+            );
+
+            localStorage.setItem("memberName", profile.name);
+            localStorage.setItem("memberEmail", profile.email);
+            localStorage.setItem("memberPhone", profile.phone);
+
+            profileMessage.textContent = "Profile saved successfully!";
+        } catch (error) {
+            profileMessage.textContent =
+                "Unable to save your profile. Check browser storage.";
+        }
+    });
+
+    loadProfile();
+</script>
+
+
+</body>
+</html>

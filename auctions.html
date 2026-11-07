@@ -1,0 +1,379 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auctions | Shivaji Youth 2026</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-body">
+
+    <aside class="sidebar">
+        <h2>🟠 Shivaji Youth</h2>
+        <p class="sidebar-subtitle">Management System</p>
+
+        <nav class="side-nav">
+            <a href="admin-dashboard.html">📊 Dashboard</a>
+            <a href="events.html">🎉 Events</a>
+            <a href="members.html">👥 Members</a>
+            <a href="chanda.html">💰 Chanda Collections</a>
+            <a class="active" href="auctions.html">🔨 Auctions</a>
+            <a href="expenses.html">🧾 Expenses</a>
+            <a href="payments.html">💳 Payments</a>
+            <a href="reports.html">📈 Reports</a>
+        </nav>
+
+        <a class="logout-link" href="admin-login.html">↩ Logout</a>
+    </aside>
+
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <div>
+                <h1>Auction Management</h1>
+                <p>Track auction items, winning bids and payments received.</p>
+            </div>
+            <span class="admin-badge">Administrator</span>
+        </header>
+
+        <section class="summary-grid">
+            <article class="summary-card">
+                <span>Total Auctions</span>
+                <h2 id="auctionCount">0</h2>
+            </article>
+            <article class="summary-card">
+                <span>Total Winning Bids</span>
+                <h2 id="bidTotal">₹0</h2>
+            </article>
+            <article class="summary-card">
+                <span>Amount Received</span>
+                <h2 id="receivedTotal">₹0</h2>
+            </article>
+            <article class="summary-card balance-card">
+                <span>Amount Pending</span>
+                <h2 id="pendingTotal">₹0</h2>
+            </article>
+        </section>
+
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+                <h2>Record Auction</h2>
+                <p>Record the winning bid and the amount actually received.</p>
+            </div>
+
+            
+<form id="auctionForm" class="auction-form-grid">
+
+    <div class="auction-form-field">
+        <label for="itemName">Auction Item Category</label>
+        <select id="itemName" required>
+            <option value="">Select auction item</option>
+            <option value="Durgamma Sarees">Durgamma Sarees</option>
+            <option value="Coconuts">Coconuts</option>
+            <option value="Fruits">Fruits</option>
+            <option value="Laddu">Laddu</option>
+            <option value="Other">Other</option>
+        </select>
+    </div>
+
+    <div id="otherItemContainer" class="auction-form-field" style="display: none;">
+        <label for="otherItemName">Other Item Name</label>
+        <input id="otherItemName" type="text"
+               placeholder="Enter auction item name">
+    </div>
+
+    <div class="auction-form-field">
+        <label for="auctionDate">Auction Date</label>
+        <input id="auctionDate" type="date" required>
+    </div>
+
+    <div class="auction-form-field">
+        <label for="bidderName">Winning Bidder Name</label>
+        <input id="bidderName" type="text"
+               placeholder="Enter bidder name" required>
+    </div>
+
+    <div class="auction-form-field">
+        <label for="bidderPhone">Bidder Phone (optional)</label>
+        <input id="bidderPhone" type="tel"
+               placeholder="Enter phone number">
+    </div>
+
+    <div class="auction-form-field">
+        <label for="winningBid">Winning Bid Amount (₹)</label>
+        <input id="winningBid" type="number" min="0.01"
+               step="0.01" placeholder="Enter winning bid" required>
+    </div>
+
+    <div class="auction-form-field">
+        <label for="amountReceived">Amount Received (₹)</label>
+        <input id="amountReceived" type="number" min="0"
+               step="0.01" value="0" required>
+    </div>
+
+    <div class="auction-form-field">
+        <label for="auctionMethod">Payment Method</label>
+        <select id="auctionMethod" required>
+            <option value="">Select method</option>
+            <option>Cash</option>
+            <option>UPI</option>
+            <option>Bank Transfer</option>
+            <option>Other</option>
+        </select>
+    </div>
+
+    <div class="auction-form-field auction-notes-field">
+        <label for="auctionNotes">Notes (optional)</label>
+        <textarea id="auctionNotes" rows="3"
+                  placeholder="Additional details"></textarea>
+    </div>
+
+    <div class="auction-form-actions">
+        <button type="submit" class="primary-btn">
+            Save Auction
+        </button>
+    </div>
+
+    <p id="auctionMessage" class="form-message"></p>
+
+</form>
+
+        </section>
+
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+                <h2>Auction Records</h2>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Date</th>
+                            <th>Winner</th>
+                            <th>Winning Bid</th>
+                            <th>Received</th>
+                            <th>Pending</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auctionTable">
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                No auctions recorded yet.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const auctionForm = document.getElementById("auctionForm");
+        const auctionTable = document.getElementById("auctionTable");
+        const auctionMessage = document.getElementById("auctionMessage");
+
+        let auctions = [];
+
+        function money(amount) {
+            return "₹" + amount.toLocaleString("en-IN", {
+                maximumFractionDigits: 2
+            });
+        }
+
+        function safeText(value) {
+            return String(value ?? "").replace(/[&<>"']/g, ch => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[ch]);
+        }
+
+        function renderAuctions() {
+            
+            const bidTotal = auctions.reduce(
+                (sum, item) => sum + item.bid, 0
+            );
+            const receivedTotal = auctions.reduce(
+                (sum, item) => sum + item.received, 0
+            );
+            const pendingTotal = auctions.reduce(
+                (sum, item) => sum + item.bid - item.received, 0
+            );
+
+            document.getElementById("auctionCount").textContent =
+                auctions.length;
+            document.getElementById("bidTotal").textContent =
+                money(bidTotal);
+            document.getElementById("receivedTotal").textContent =
+                money(receivedTotal);
+            document.getElementById("pendingTotal").textContent =
+                money(pendingTotal);
+
+            if (auctions.length === 0) {
+                auctionTable.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            No auctions recorded yet.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            auctionTable.innerHTML = auctions.map((item, index) => `
+                <tr>
+                    <td>${safeText(item.item)}</td>
+                    <td>${safeText(item.date)}</td>
+                    <td>${safeText(item.bidder)}</td>
+                    <td>${money(item.bid)}</td>
+                    <td>${money(item.received)}</td>
+                    <td>${money(item.bid - item.received)}</td>
+                    <td>
+                        <button type="button" onclick="deleteAuction(${item.id})">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            `).join("");
+        }
+
+        
+          async function loadAuctions() {
+    try {
+        const response = await fetch("http://localhost:8080/api/auctions");
+
+        if (!response.ok) {
+            throw new Error("Failed to load auctions.");
+        }
+
+        auctions = await response.json();
+        renderAuctions();
+
+    } catch (error) {
+        console.error("Error loading auctions:", error);
+        auctionMessage.textContent =
+            "Could not load auctions. Check that the backend is running.";
+    }
+}
+        
+auctionForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    let item = document.getElementById("itemName").value;
+
+    if (item === "Other") {
+        item = document.getElementById("otherItemName").value.trim();
+    }
+
+    const date = document.getElementById("auctionDate").value;
+    const bidder = document.getElementById("bidderName").value.trim();
+    const phone = document.getElementById("bidderPhone").value.trim();
+    const bid = Number(document.getElementById("winningBid").value);
+    const received = Number(
+        document.getElementById("amountReceived").value
+    );
+    const method = document.getElementById("auctionMethod").value;
+    const notes = document.getElementById("auctionNotes").value.trim();
+
+    if (!item || !date || !bidder || !method ||
+        !Number.isFinite(bid) || !Number.isFinite(received) ||
+        bid <= 0 || received < 0 || received > bid) {
+
+        auctionMessage.textContent =
+            "Enter valid details. Received amount cannot exceed the winning bid.";
+        return;
+    }
+
+    try {
+        const response = await fetch("http://localhost:8080/api/auctions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                item,
+                date,
+                bidder,
+                phone,
+                bid,
+                received,
+                method,
+                notes
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || "Failed to save auction.");
+        }
+
+        const savedAuction = await response.json();
+
+        auctions.push(savedAuction);
+
+        auctionForm.reset();
+        document.getElementById("amountReceived").value = "0";
+        auctionMessage.textContent = "Auction saved successfully to the database.";
+
+        renderAuctions();
+
+    } catch (error) {
+        console.error("Error saving auction:", error);
+        auctionMessage.textContent =
+            "Could not save auction. Check that the backend is running.";
+    }
+});
+
+
+        
+async function deleteAuction(id) {
+    if (!confirm("Are you sure you want to delete this auction?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            `http://localhost:8080/api/auctions/${id}`,
+            { method: "DELETE" }
+        );
+
+        if (!response.ok) {
+            throw new Error("Failed to delete auction.");
+        }
+
+        auctions = auctions.filter(item => item.id !== id);
+
+        renderAuctions();
+        auctionMessage.textContent = "Auction record deleted successfully.";
+
+    } catch (error) {
+        console.error("Error deleting auction:", error);
+        auctionMessage.textContent =
+            "Could not delete auction. Please check the backend.";
+    }
+}
+
+
+        loadAuctions();
+    const itemCategory = document.getElementById("itemName");
+    const otherItemContainer = document.getElementById("otherItemContainer");
+    const otherItemName = document.getElementById("otherItemName");
+
+itemCategory.addEventListener("change", function () {
+    if (itemCategory.value === "Other") {
+        otherItemContainer.style.display = "block";
+        otherItemName.required = true;
+    } else {
+        otherItemContainer.style.display = "none";
+        otherItemName.required = false;
+        otherItemName.value = "";
+    }
+});
+
+    </script>
+</body>
+</html>

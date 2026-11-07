@@ -1,0 +1,278 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments | Shivaji Youth 2026</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-body">
+
+    <aside class="sidebar">
+        <h2>🟠 Shivaji Youth</h2>
+        <p class="sidebar-subtitle">Management System</p>
+
+        <nav class="side-nav">
+            <a href="admin-dashboard.html">📊 Dashboard</a>
+            <a href="events.html">🎉 Events</a>
+            <a href="members.html">👥 Members</a>
+            <a href="chanda.html">💰 Chanda Collections</a>
+            <a href="auctions.html">🔨 Auctions</a>
+            <a href="expenses.html">🧾 Expenses</a>
+            <a class="active" href="payments.html">💳 Payments</a>
+            <a href="reports.html">📈 Reports</a>
+        </nav>
+
+        <a class="logout-link" href="admin-login.html">↩ Logout</a>
+    </aside>
+
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <div>
+                <h1>Payments Management</h1>
+                <p>Record received payments and track outstanding amounts.</p>
+            </div>
+            <span class="admin-badge">Administrator</span>
+        </header>
+
+        <section class="summary-grid">
+            <article class="summary-card">
+                <span>Total Payment Records</span>
+                <h2 id="paymentCount">0</h2>
+            </article>
+
+            <article class="summary-card">
+                <span>Total Amount Due</span>
+                <h2 id="dueTotal">₹0</h2>
+            </article>
+
+            <article class="summary-card">
+                <span>Amount Received</span>
+                <h2 id="receivedTotal">₹0</h2>
+            </article>
+
+            <article class="summary-card balance-card">
+                <span>Amount Pending</span>
+                <h2 id="pendingTotal">₹0</h2>
+            </article>
+        </section>
+
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+                <h2>Record Payment</h2>
+                <p>Use this page for payment obligations that need separate tracking.</p>
+            </div>
+
+            <form id="paymentForm">
+                <label for="payerName">Payer / Member Name</label>
+                <input type="text" id="payerName"
+                       placeholder="Enter name" required>
+
+                <label for="paymentPurpose">Payment Purpose</label>
+                <select id="paymentPurpose" required>
+                    <option value="">Select purpose</option>
+                    <option>Event Contribution</option>
+                    <option>Membership Fee</option>
+                    <option>Vendor Payment</option>
+                    <option>Donation</option>
+                    <option>Other</option>
+                </select>
+
+                <label for="paymentDate">Date</label>
+                <input type="date" id="paymentDate" required>
+
+                <label for="paymentDue">Total Amount Due (₹)</label>
+                <input type="number" id="paymentDue"
+                       min="0.01" step="0.01" placeholder="Enter total due" required>
+
+                <label for="paymentReceived">Amount Received (₹)</label>
+                <input type="number" id="paymentReceived"
+                       min="0" step="0.01" value="0" required>
+
+                <label for="paymentType">Payment Method</label>
+                <select id="paymentType" required>
+                    <option value="">Select payment method</option>
+                    <option>Cash</option>
+                    <option>UPI</option>
+                    <option>Bank Transfer</option>
+                    <option>Other</option>
+                </select>
+
+                <label for="paymentReference">Transaction / Receipt Reference (optional)</label>
+                <input type="text" id="paymentReference"
+                       placeholder="Enter transaction ID or receipt number">
+
+                <label for="paymentNotes">Notes (optional)</label>
+                <textarea id="paymentNotes" rows="3"
+                          placeholder="Additional information"></textarea>
+
+                <button type="submit" class="primary-btn">
+                    Save Payment Record
+                </button>
+
+                <p id="paymentMessage" class="form-message"></p>
+            </form>
+        </section>
+
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+                <h2>Payment History</h2>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Payer</th>
+                            <th>Purpose</th>
+                            <th>Due</th>
+                            <th>Received</th>
+                            <th>Pending</th>
+                            <th>Method</th>
+                            <th>Reference</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentTable">
+                        <tr>
+                            <td colspan="9" class="empty-state">
+                                No payment records yet.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const paymentForm = document.getElementById("paymentForm");
+        const paymentTable = document.getElementById("paymentTable");
+        const paymentMessage = document.getElementById("paymentMessage");
+
+        let payments = JSON.parse(
+            localStorage.getItem("shivajiPayments") || "[]"
+        );
+
+        function money(amount) {
+            return "₹" + amount.toLocaleString("en-IN", {
+                maximumFractionDigits: 2
+            });
+        }
+
+        function safeText(value) {
+            return String(value ?? "").replace(/[&<>"']/g, ch => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[ch]);
+        }
+
+        function renderPayments() {
+            const due = payments.reduce(
+                (sum, item) => sum + item.due, 0
+            );
+
+            const received = payments.reduce(
+                (sum, item) => sum + item.received, 0
+            );
+
+            const pending = payments.reduce(
+                (sum, item) => sum + item.due - item.received, 0
+            );
+
+            document.getElementById("paymentCount").textContent =
+                payments.length;
+            document.getElementById("dueTotal").textContent = money(due);
+            document.getElementById("receivedTotal").textContent =
+                money(received);
+            document.getElementById("pendingTotal").textContent =
+                money(pending);
+
+            if (payments.length === 0) {
+                paymentTable.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="empty-state">
+                            No payment records yet.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            paymentTable.innerHTML = payments.map((item, index) => `
+                <tr>
+                    <td>${safeText(item.date)}</td>
+                    <td>${safeText(item.name)}</td>
+                    <td>${safeText(item.purpose)}</td>
+                    <td>${money(item.due)}</td>
+                    <td>${money(item.received)}</td>
+                    <td>${money(item.due - item.received)}</td>
+                    <td>${safeText(item.method)}</td>
+                    <td>${safeText(item.reference || "-")}</td>
+                    <td>
+                        <button type="button" onclick="deletePayment(${index})">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            `).join("");
+        }
+
+        paymentForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById("payerName").value.trim();
+            const purpose = document.getElementById("paymentPurpose").value;
+            const date = document.getElementById("paymentDate").value;
+            const due = Number(document.getElementById("paymentDue").value);
+            const received = Number(
+                document.getElementById("paymentReceived").value
+            );
+            const method = document.getElementById("paymentType").value;
+            const reference =
+                document.getElementById("paymentReference").value.trim();
+            const notes = document.getElementById("paymentNotes").value.trim();
+
+            if (!name || !purpose || !date || !method ||
+                !Number.isFinite(due) || !Number.isFinite(received) ||
+                due <= 0 || received < 0 || received > due) {
+                paymentMessage.textContent =
+                    "Enter valid details. Received amount cannot exceed the amount due.";
+                return;
+            }
+
+            payments.push({
+                name, purpose, date, due, received, method, reference, notes
+            });
+
+            localStorage.setItem(
+                "shivajiPayments", JSON.stringify(payments)
+            );
+
+            paymentForm.reset();
+            document.getElementById("paymentReceived").value = "0";
+            paymentMessage.textContent = "Payment record saved successfully.";
+            renderPayments();
+        });
+
+        function deletePayment(index) {
+            if (confirm("Are you sure you want to delete this payment record?")) {
+                payments.splice(index, 1);
+
+                localStorage.setItem(
+                    "shivajiPayments", JSON.stringify(payments)
+                );
+
+                renderPayments();
+                paymentMessage.textContent = "Payment record deleted.";
+            }
+        }
+
+        renderPayments();
+    </script>
+</body>
+</html>
