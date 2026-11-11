@@ -221,7 +221,7 @@ let members = [];
 
 async function loadMembers() {
     try {
-        const response = await fetch("http://localhost:8080/api/members");
+        const response = await fetch("https://shivaji-youth-2026-backend.onrender.com");
 
         if (!response.ok) {
             throw new Error("Failed to load members");
