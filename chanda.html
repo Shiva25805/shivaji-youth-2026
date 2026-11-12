@@ -166,9 +166,7 @@
         const chandaTable = document.getElementById("chandaTable");
         const chandaMessage = document.getElementById("chandaMessage");
 
-        let contributions = JSON.parse(
-            localStorage.getItem("shivajiChanda") || "[]"
-        );
+        let contributions = [];
 
         function formatMoney(amount) {
             return "₹" + amount.toLocaleString("en-IN", {
@@ -185,6 +183,33 @@
                 "'": "&#39;"
             })[ch]);
         }
+           
+async function loadChanda() {
+    try {
+        const response = await fetch("http://localhost:8080/api/chanda", {
+            credentials: "include"
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to load Chanda records.");
+        }
+
+        contributions = await response.json();
+
+        contributions = contributions.map(item => ({
+            ...item,
+            amount: Number(item.amount)
+        }));
+
+        renderChanda();
+
+    } catch (error) {
+        console.error("Error loading Chanda records:", error);
+        chandaMessage.textContent =
+            "Could not load Chanda records. Check the backend and admin login.";
+    }
+}
+
 
         function renderChanda() {
             const total = contributions.reduce(
@@ -235,7 +260,7 @@
             `).join("");
         }
 
-        chandaForm.addEventListener("submit", function(event) {
+        chandaForm.addEventListener("submit", async function(event) {
             event.preventDefault();
 
             const name = document.getElementById("contributorName").value.trim();
@@ -255,31 +280,76 @@
                 return;
             }
 
-            contributions.push({
-                name, phone, date, amount, method, purpose, notes
-            });
+            
+            try {
+                const response = await fetch("http://localhost:8080/api/chanda", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include",
+                    body: JSON.stringify({
+                        name, phone, date, amount, method, purpose, notes
+                    })
+                });
 
-            localStorage.setItem(
-                "shivajiChanda", JSON.stringify(contributions)
-            );
+                if (!response.ok) {
+                    throw new Error("Failed to save contribution.");
+                }
 
-            chandaForm.reset();
-            chandaMessage.textContent = "Contribution saved successfully.";
-            renderChanda();
+                chandaForm.reset();
+                chandaMessage.textContent =
+                    "Contribution saved successfully to the database.";
+
+                await loadChanda();
+
+            } catch (error) {
+                console.error("Error saving Chanda:", error);
+                chandaMessage.textContent =
+                    "Could not save contribution. Check the backend and admin login.";
+            }
+
         });
 
-        function deleteContribution(index) {
-            if (confirm("Delete this contribution record?")) {
-                contributions.splice(index, 1);
-                localStorage.setItem(
-                    "shivajiChanda", JSON.stringify(contributions)
-                );
-                renderChanda();
-                chandaMessage.textContent = "Contribution record deleted.";
+             
+async function deleteContribution(index) {
+    const contribution = contributions[index];
+
+    if (!contribution) {
+        return;
+    }
+
+    if (!confirm("Delete this contribution record?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            `http://localhost:8080/api/chanda/${contribution.id}`,
+            {
+                method: "DELETE",
+                credentials: "include"
             }
+        );
+
+        if (!response.ok) {
+            throw new Error("Failed to delete contribution.");
         }
 
-        renderChanda();
+        chandaMessage.textContent =
+            "Contribution record deleted successfully.";
+
+        await loadChanda();
+
+    } catch (error) {
+        console.error("Error deleting Chanda:", error);
+        chandaMessage.textContent =
+            "Could not delete contribution. Check the backend and admin login.";
+    }
+}
+
+
+        loadChanda();
     </script>
 </body>
 </html>

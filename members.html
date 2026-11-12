@@ -219,12 +219,20 @@ let currentPage = 1;
 
 let members = [];
 
-async function loadMembers() {
+        async function loadMembers() {
     try {
-        const response = await fetch("https://shivaji-youth-2026-backend.onrender.com");
+        const response = await fetch(
+            (location.hostname === "localhost" ||
+             location.hostname === "127.0.0.1")
+                ? "http://127.0.0.1:8080/api/members"
+                : "https://shivaji-youth-2026-backend.onrender.com/api/members",
+            {
+                credentials: "include"
+            }
+        );
 
         if (!response.ok) {
-            throw new Error("Failed to load members");
+            throw new Error("Failed to load members: " + response.status);
         }
 
         members = await response.json();
@@ -476,10 +484,15 @@ function closeMemberDetails() {
     try {
         const response = await fetch(
             editId
-                ? `http://localhost:8080/api/members/${editId}`
-                : "http://localhost:8080/api/members",
+    ? `${location.hostname === "localhost" || location.hostname === "127.0.0.1"
+        ? "http://127.0.0.1:8080"
+        : "https://shivaji-youth-2026-backend.onrender.com"}/api/members/${editId}`
+    : `${location.hostname === "localhost" || location.hostname === "127.0.0.1"
+        ? "http://127.0.0.1:8080"
+        : "https://shivaji-youth-2026-backend.onrender.com"}/api/members`,
             {
                 method: editId ? "PUT" : "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -519,8 +532,41 @@ function closeMemberDetails() {
         memberMessage.textContent = "Could not save member. Check the Console.";
         memberMessage.style.color = "red";
     }
-         
 });
+
+              
+function editMember(id) {
+    const member = members.find(
+        member => String(member.id) === String(id)
+    );
+
+    if (!member) {
+        memberMessage.textContent = "Member not found.";
+        memberMessage.style.color = "red";
+        return;
+    }
+
+    document.getElementById("memberName").value = member.name || "";
+    document.getElementById("memberPhone").value = member.phone || "";
+    document.getElementById("memberEmail").value = member.email || "";
+    document.getElementById("memberRole").value = member.role || "";
+    document.getElementById("memberStatus").value = member.status || "Active";
+    document.getElementById("memberAddress").value = member.address || "";
+
+    memberForm.dataset.editId = member.id;
+
+    document.querySelector("#memberForm button[type='submit']")
+        .textContent = "Update Member";
+
+    memberMessage.textContent = "Editing member: " + member.name;
+    memberMessage.style.color = "blue";
+
+    document.getElementById("memberForm").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
+
 
 
 
@@ -567,9 +613,12 @@ async function toggleMemberStatus(index) {
 
     try {
         const response = await fetch(
-            `http://localhost:8080/api/members/${member.id}/status`,
+                      `${location.hostname === "localhost" || location.hostname === "127.0.0.1"
+    ? "http://127.0.0.1:8080"
+    : "https://shivaji-youth-2026-backend.onrender.com"}/api/members/${member.id}/status`,
             {
                 method: "PUT",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -607,9 +656,14 @@ async function deleteMember(index) {
 
     try {
         const response = await fetch(
-            `http://localhost:8080/api/members/${member.id}`,
+                `${location.hostname === "localhost" || location.hostname === "127.0.0.1"
+    ? "http://127.0.0.1:8080"
+    : "https://shivaji-youth-2026-backend.onrender.com"}/api/members/${member.id}`,
             {
-                method: "DELETE"
+                method: "DELETE",
+                credentials: "include"
+
+
             }
         );
 
@@ -829,7 +883,15 @@ document.getElementById("exportExcel").addEventListener(
           
 async function downloadMembersBackup() {
     try {
-        const response = await fetch("http://localhost:8080/api/members");
+           const response = await fetch(
+    (location.hostname === "localhost" ||
+     location.hostname === "127.0.0.1")
+        ? "http://127.0.0.1:8080/api/members"
+        : "https://shivaji-youth-2026-backend.onrender.com/api/members",
+    {
+        credentials: "include"
+    }
+);
 
         if (!response.ok) {
             throw new Error("Failed to fetch member records.");
@@ -919,16 +981,21 @@ document.getElementById("backupFile").addEventListener(
                 return;
             }
 
+             
             const response = await fetch(
-                "http://localhost:8080/api/members/restore",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(backup.members)
-                }
-            );
+    (location.hostname === "localhost" ||
+     location.hostname === "127.0.0.1")
+        ? "http://127.0.0.1:8080/api/members/restore"
+        : "https://shivaji-youth-2026-backend.onrender.com/api/members/restore",
+    {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(backup.members)
+    }
+);
 
             if (!response.ok) {
                 const errorText = await response.text();
@@ -948,19 +1015,21 @@ document.getElementById("backupFile").addEventListener(
 
         } catch (error) {
             console.error("Backup validation error:", error);
-            alert("Invalid backup file. Please select a valid Shivaji Youth backup.");
+            alert("Restore error: " + error.message);
         } finally {
             event.target.value = "";
         }
     }
 );
               
-document.getElementById("closeMemberModal").addEventListener(
-    "click",
-    function () {
+const closeMemberModalButton =
+    document.getElementById("closeMemberModal");
+
+if (closeMemberModalButton) {
+    closeMemberModalButton.addEventListener("click", function () {
         document.getElementById("memberDetailsModal").style.display = "none";
-    }
-);
+    });
+}
 
 
 

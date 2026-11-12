@@ -233,6 +233,10 @@
                     <td>${money(item.received)}</td>
                     <td>${money(item.bid - item.received)}</td>
                     <td>
+                        <button type="button" onclick="editAuction(${item.id})">
+                            Edit
+                        </button>
+
                         <button type="button" onclick="deleteAuction(${item.id})">
                             Delete
                         </button>
@@ -244,7 +248,9 @@
         
           async function loadAuctions() {
     try {
-        const response = await fetch("http://localhost:8080/api/auctions");
+             const response = await fetch("https://shivaji-youth-2026-backend.onrender.com/api/auctions", {
+    credentials: "include"
+        });
 
         if (!response.ok) {
             throw new Error("Failed to load auctions.");
@@ -260,6 +266,7 @@
     }
 }
         
+           
 auctionForm.addEventListener("submit", async function(event) {
     event.preventDefault();
 
@@ -278,6 +285,7 @@ auctionForm.addEventListener("submit", async function(event) {
     );
     const method = document.getElementById("auctionMethod").value;
     const notes = document.getElementById("auctionNotes").value.trim();
+    const editId = auctionForm.dataset.editId;
 
     if (!item || !date || !bidder || !method ||
         !Number.isFinite(bid) || !Number.isFinite(received) ||
@@ -289,22 +297,28 @@ auctionForm.addEventListener("submit", async function(event) {
     }
 
     try {
-        const response = await fetch("http://localhost:8080/api/auctions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                item,
-                date,
-                bidder,
-                phone,
-                bid,
-                received,
-                method,
-                notes
-            })
-        });
+        const response = await fetch(
+            editId
+                ? `https://shivaji-youth-2026-backend.onrender.com/api/auctions/${editId}`
+                : "https://shivaji-youth-2026-backend.onrender.com/api/auctions",
+            {
+                method: editId ? "PUT" : "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    item,
+                    date,
+                    bidder,
+                    phone,
+                    bid,
+                    received,
+                    method,
+                    notes
+                })
+            }
+        );
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -313,20 +327,112 @@ auctionForm.addEventListener("submit", async function(event) {
 
         const savedAuction = await response.json();
 
-        auctions.push(savedAuction);
+        if (editId) {
+            auctions = auctions.map(item =>
+                String(item.id) === String(editId)
+                    ? savedAuction
+                    : item
+            );
+        } else {
+            auctions.push(savedAuction);
+        }
 
         auctionForm.reset();
+        delete auctionForm.dataset.editId;
+
         document.getElementById("amountReceived").value = "0";
-        auctionMessage.textContent = "Auction saved successfully to the database.";
+
+        document.getElementById("otherItemContainer").style.display = "none";
+        document.getElementById("otherItemName").required = false;
+
+        auctionForm.querySelector(
+            "button[type='submit']"
+        ).textContent = "Save Auction";
+
+        auctionMessage.textContent = editId
+            ? "Auction updated successfully."
+            : "Auction saved successfully to the database.";
 
         renderAuctions();
 
     } catch (error) {
         console.error("Error saving auction:", error);
         auctionMessage.textContent =
-            "Could not save auction. Check that the backend is running.";
+            "Could not save or update auction. Check the backend.";
     }
 });
+
+       
+          function editAuction(id) {
+    const auction = auctions.find(
+        item => String(item.id) === String(id)
+    );
+
+    if (!auction) {
+        auctionMessage.textContent = "Auction record not found.";
+        return;
+    }
+
+    const itemCategory = document.getElementById("itemName");
+    const otherItemContainer =
+        document.getElementById("otherItemContainer");
+    const otherItemName =
+        document.getElementById("otherItemName");
+
+    const predefinedItems = [
+        "Durgamma Sarees",
+        "Coconuts",
+        "Fruits",
+        "Laddu"
+    ];
+
+    if (predefinedItems.includes(auction.item)) {
+        itemCategory.value = auction.item;
+        otherItemContainer.style.display = "none";
+        otherItemName.required = false;
+        otherItemName.value = "";
+    } else {
+        itemCategory.value = "Other";
+        otherItemContainer.style.display = "block";
+        otherItemName.required = true;
+        otherItemName.value = auction.item || "";
+    }
+
+    document.getElementById("auctionDate").value =
+        auction.date || "";
+
+    document.getElementById("bidderName").value =
+        auction.bidder || "";
+
+    document.getElementById("bidderPhone").value =
+        auction.phone || "";
+
+    document.getElementById("winningBid").value =
+        auction.bid ?? "";
+
+    document.getElementById("amountReceived").value =
+        auction.received ?? 0;
+
+    document.getElementById("auctionMethod").value =
+        auction.method || "";
+
+    document.getElementById("auctionNotes").value =
+        auction.notes || "";
+
+    auctionForm.dataset.editId = auction.id;
+
+    auctionForm.querySelector(
+        "button[type='submit']"
+    ).textContent = "Update Auction";
+
+    auctionMessage.textContent =
+        "Editing auction. Make your changes and click Update Auction.";
+
+    auctionForm.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
 
 
         
@@ -336,9 +442,12 @@ async function deleteAuction(id) {
     }
 
     try {
-        const response = await fetch(
-            `http://localhost:8080/api/auctions/${id}`,
-            { method: "DELETE" }
+          const response = await fetch(
+            `https://shivaji-youth-2026-backend.onrender.com/api/auctions/${id}`,
+        {
+        method: "DELETE",
+        credentials: "include"
+        }
         );
 
         if (!response.ok) {

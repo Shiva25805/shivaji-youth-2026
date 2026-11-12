@@ -156,11 +156,81 @@
             }
         };
 
-        const chanda = readRecords("shivajiChanda");
-        const auctions = readRecords("shivajiAuctions");
-        const events = readRecords("shivajiEvents");
-        const expenses = readRecords("shivajiExpenses");
-        const payments = readRecords("shivajiPayments");
+             
+let chanda = [];
+
+let auctions = [];
+let events = [];
+let expenses = [];
+let payments = [];
+
+           
+async function loadReportData() {
+    try {
+        const [
+            chandaResponse,
+            auctionResponse,
+            eventResponse,
+            expenseResponse,
+            paymentResponse
+        ] = await Promise.all([
+            fetch("http://localhost:8080/api/chanda", {
+                credentials: "include"
+            }),
+            fetch("http://localhost:8080/api/auctions", {
+                credentials: "include"
+            }),
+            fetch("http://localhost:8080/api/events", {
+                credentials: "include"
+            }),
+            fetch("http://localhost:8080/api/expenses", {
+                credentials: "include"
+            }),
+            fetch("http://localhost:8080/api/payments", {
+                credentials: "include"
+            })
+        ]);
+
+        if (
+            !chandaResponse.ok ||
+            !auctionResponse.ok ||
+            !eventResponse.ok ||
+            !expenseResponse.ok ||
+            !paymentResponse.ok
+        ) {
+            throw new Error("Could not load financial records.");
+        }
+
+        [
+            chanda,
+            auctions,
+            events,
+            expenses,
+            payments
+        ] = await Promise.all([
+            chandaResponse.json(),
+            auctionResponse.json(),
+            eventResponse.json(),
+            expenseResponse.json(),
+            paymentResponse.json()
+        ]);
+
+        chanda = chanda.map(item => ({
+            ...item,
+            amount: Number(item.amount)
+        }));
+
+        renderReport();
+
+    } catch (error) {
+        console.error("Error loading report data:", error);
+
+        document.getElementById("filterMessage").textContent =
+            "Could not load financial records. Check the backend and admin login.";
+    }
+}
+
+
 
         let filteredTransactions = [];
 
@@ -366,7 +436,7 @@
             URL.revokeObjectURL(url);
         });
 
-        renderReport();
+        loadReportData();
     </script>
 </body>
 </html>

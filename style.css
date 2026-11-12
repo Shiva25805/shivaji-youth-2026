@@ -2036,3 +2036,748 @@ body.dashboard-body .dashboard-panel th {
         width: 100%;
     }
 }
+
+
+/* Member profile: vertical layout */
+body.auth-page #profileForm {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: 450px !important;
+    margin: 20px auto !important;
+}
+
+body.auth-page #profileForm label {
+    display: block !important;
+    width: 100% !important;
+    margin: 8px 0 4px !important;
+    text-align: left !important;
+}
+
+body.auth-page #profileForm input,
+body.auth-page #profileForm button {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+}
+
+body.auth-page #profileForm .profile-photo-section {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    gap: 8px !important;
+}
+/* Force profile form fields into one vertical column */
+body.auth-page form#profileForm {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-auto-flow: row !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 450px !important;
+    margin: 20px auto !important;
+}
+
+body.auth-page form#profileForm > * {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+/* My Profile: clean vertical layout */
+body.auth-page #profileForm {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    width: 100% !important;
+    max-width: 500px !important;
+    margin: 25px auto !important;
+}
+
+body.auth-page #profileForm label {
+    display: block !important;
+    width: 100% !important;
+    margin: 8px 0 0 !important;
+    text-align: left !important;
+}
+
+body.auth-page #profileForm input,
+body.auth-page #profileForm textarea,
+body.auth-page #profileForm button {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+}
+
+body.auth-page #profileForm .profile-photo-section {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    width: 100% !important;
+}
+
+body.auth-page #profileForm input[type="file"] {
+    padding: 10px;
+}
+
+body.auth-page #profileForm input:not([type="file"]),
+body.auth-page #profileForm textarea {
+    padding: 12px;
+    border-radius: 8px;
+}
+
+body.auth-page #profileForm textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* My Profile page — centered white card */
+body.profile-page {
+    min-height: 100vh;
+    padding: 30px 16px;
+    box-sizing: border-box;
+}
+
+body.profile-page > h1,
+body.profile-page > p,
+body.profile-page > img,
+body.profile-page > #profileForm,
+body.profile-page > #profileMessage,
+body.profile-page > .auth-icon {
+    display: block;
+}
+
+body.profile-page > h1,
+body.profile-page > p {
+    text-align: center;
+}
+
+body.profile-page > img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin: 20px auto;
+}
+
+ body.auth-page.profile-page #profileForm {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    width: 100% !important;
+    max-width: 440px !important;
+    margin: 0 auto !important;
+    padding: 30px 34px !important;
+    box-sizing: border-box !important;
+    background: #ffffff !important;
+    border-radius: 20px !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.18) !important;
+}
+
+     body.auth-page.profile-page #profileForm .profile-photo-section {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    width: 100% !important;
+}
+
+body.auth-page.profile-page #profileForm label {
+    display: block !important;
+    width: 100% !important;
+    margin: 8px 0 0 !important;
+    color: #15243b !important;
+    font-weight: 600 !important;
+    text-align: left !important;
+}
+
+body.auth-page.profile-page #profileForm input:not([type="file"]),
+body.auth-page.profile-page #profileForm input[type="file"],
+body.auth-page.profile-page #profileForm textarea {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 12px !important;
+    box-sizing: border-box !important;
+    border: 1px solid #d5deea !important;
+    border-radius: 9px !important;
+    background: #ffffff !important;
+    color: #15243b !important;
+    font: inherit !important;
+}
+
+body.profile-page #profileForm textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+body.profile-page #profileForm button {
+    width: 100% !important;
+    margin-top: 14px !important;
+}
+
+@media (max-width: 480px) {
+    body.profile-page #profileForm {
+        padding: 24px 20px !important;
+    }
+}
+
+
+/* Fix My Profile form vertical layout */
+body.auth-page.profile-page #profileForm {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 440px !important;
+    margin: 20px auto !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+}
+
+body.auth-page.profile-page #profileForm label {
+    display: block !important;
+    width: 100% !important;
+    text-align: left !important;
+    margin: 8px 0 3px !important;
+}
+
+body.auth-page.profile-page #profileForm input,
+body.auth-page.profile-page #profileForm textarea,
+body.auth-page.profile-page #profileForm button {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+body.auth-page.profile-page #profileForm .profile-photo-section {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    gap: 8px !important;
+}
+
+
+/* Final profile layout fix */
+body.profile-page #profileForm {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 440px !important;
+    margin: 20px auto !important;
+    padding: 28px !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
+    background: #fff !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12) !important;
+}
+
+body.profile-page #profileForm .profile-photo-section {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+}
+
+body.profile-page #profileForm label {
+    display: block !important;
+    width: 100% !important;
+    text-align: left !important;
+    margin: 8px 0 3px !important;
+}
+
+body.profile-page #profileForm input,
+body.profile-page #profileForm textarea,
+body.profile-page #profileForm button {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+body.profile-page #profileForm textarea {
+    min-height: 100px !important;
+    resize: vertical;
+}
+
+
+/* My Profile page - final layout */
+body.auth-page.profile-page {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    min-height: 100vh !important;
+    padding: 30px 16px !important;
+    box-sizing: border-box !important;
+    background: linear-gradient(135deg, #101b32, #263e65);
+}
+
+body.auth-page.profile-page > .auth-icon {
+    display: none !important;
+}
+
+body.auth-page.profile-page > h1 {
+    display: block !important;
+    order: 0 !important;
+    width: 100% !important;
+    max-width: 440px !important;
+    margin: 0 auto 6px !important;
+    text-align: center !important;
+    color: #15243b !important;
+}
+
+body.auth-page.profile-page > p {
+    display: block !important;
+    order: 1 !important;
+    width: 100% !important;
+    max-width: 440px !important;
+    margin: 0 auto 18px !important;
+    text-align: center !important;
+    color: #64748b !important;
+}
+
+body.auth-page.profile-page > img {
+    display: block !important;
+    order: 2 !important;
+    width: 120px !important;
+    height: 120px !important;
+    margin: 0 auto 20px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+}
+
+body.auth-page.profile-page > #profileForm {
+    display: flex !important;
+    order: 3 !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: 440px !important;
+    margin: 0 auto !important;
+    padding: 28px !important;
+    box-sizing: border-box !important;
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12) !important;
+}
+
+body.auth-page.profile-page #profileForm .profile-photo-section {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    width: 100% !important;
+}
+
+body.auth-page.profile-page #profileForm label {
+    display: block !important;
+    width: 100% !important;
+    margin: 8px 0 3px !important;
+    text-align: left !important;
+    color: #15243b !important;
+    font-weight: 600 !important;
+}
+
+body.auth-page.profile-page #profileForm input,
+body.auth-page.profile-page #profileForm textarea,
+body.auth-page.profile-page #profileForm button {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+body.auth-page.profile-page #profileForm input:not([type="file"]),
+body.auth-page.profile-page #profileForm input[type="file"],
+body.auth-page.profile-page #profileForm textarea {
+    padding: 12px !important;
+    border: 1px solid #d5deea !important;
+    border-radius: 8px !important;
+    background: #ffffff !important;
+    color: #15243b !important;
+    font: inherit !important;
+}
+
+body.auth-page.profile-page #profileForm textarea {
+    min-height: 100px !important;
+    resize: vertical !important;
+}
+
+body.auth-page.profile-page #profileForm button {
+    margin-top: 14px !important;
+}
+
+@media (max-width: 480px) {
+    body.auth-page.profile-page > #profileForm {
+        padding: 22px 18px !important;
+    }
+}
+
+/* My Profile page - clean vertical card layout */
+body.auth-page.profile-page {
+    min-height: 100vh;
+    height: auto;
+    margin: 0;
+    padding: 35px 16px;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0;
+    box-sizing: border-box;
+}
+
+/* Main profile card */
+body.auth-page.profile-page .profile-card {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 30px;
+    background: linear-gradient(135deg, #101b32, #263e65);
+    border: 1px solid #405577;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(24, 39, 75, 0.10);
+    box-sizing: border-box;
+    color: #ffffff;
+}
+
+/* Profile photo */
+body.auth-page.profile-page #profilePhotoPreview {
+    display: block;
+    width: 125px;
+    height: 125px;
+    margin: 0 auto 18px !important;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #e8eef9;
+}
+
+/* Heading and description */
+body.auth-page.profile-page .profile-card h1 {
+    margin: 0 0 8px;
+    text-align: center;
+    color: #172b4d;
+    font-size: 28px;
+}
+
+body.auth-page.profile-page .profile-description {
+    margin: 0 0 24px;
+    text-align: center;
+    color: #68758a;
+    font-size: 14px;
+}
+
+/* Force all form content into a vertical layout */
+body.auth-page.profile-page #profileForm {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0;
+    width: 100%;
+    margin: 0;
+}
+
+/* Photo upload section */
+body.auth-page.profile-page .profile-photo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin: 0 0 22px;
+}
+
+/* Each field */
+body.auth-page.profile-page .profile-field {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    margin: 0 0 18px;
+}
+
+/* Labels */
+body.auth-page.profile-page #profileForm label {
+    display: block;
+    margin: 0 0 7px;
+    color: #27364b;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Inputs and address */
+body.auth-page.profile-page #profileForm input:not([type="file"]),
+body.auth-page.profile-page #profileForm textarea {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 12px 14px;
+    border: 1px solid #d6deea;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #172033;
+    font: inherit;
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+body.auth-page.profile-page #profileForm textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+body.auth-page.profile-page #profileForm input:focus,
+body.auth-page.profile-page #profileForm textarea:focus {
+    border-color: #3867d6;
+    box-shadow: 0 0 0 3px rgba(56, 103, 214, 0.12);
+}
+
+/* File input */
+body.auth-page.profile-page #profilePhoto {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 9px;
+    background: #f8faff;
+    box-sizing: border-box;
+}
+
+body.auth-page.profile-page .profile-photo-section small {
+    color: #748096;
+    font-size: 12px;
+}
+
+/* Update button */
+body.auth-page.profile-page #profileForm .auth-button {
+    display: block;
+    width: 100%;
+    margin: 6px 0 0;
+    padding: 13px 18px;
+    border: none;
+    border-radius: 9px;
+    background: #2457c5;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+body.auth-page.profile-page #profileForm .auth-button:hover {
+    background: #1946a8;
+}
+
+/* Status message */
+body.auth-page.profile-page #profileMessage {
+    margin: 16px 0 0;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+/* Mobile layout */
+@media (max-width: 480px) {
+    body.auth-page.profile-page {
+        padding: 18px 12px;
+    }
+
+    body.auth-page.profile-page .profile-card {
+        padding: 22px 18px;
+        border-radius: 14px;
+    }
+
+    body.auth-page.profile-page .profile-card h1 {
+        font-size: 24px;
+    }
+}
+
+body.auth-page.profile-page .profile-card label {
+    color: #ffffff;
+}
+
+/* Blue profile form fields */
+body.auth-page.profile-page .profile-card input:not([type="file"]),
+body.auth-page.profile-page .profile-card textarea {
+    background: #263e65 !important;
+    border: 1px solid #607da8 !important;
+}
+
+body.auth-page.profile-page .profile-card input::placeholder,
+body.auth-page.profile-page .profile-card textarea::placeholder {
+    color: #d1dced !important;
+}
+
+/* Yellow Update Profile button */
+body.auth-page.profile-page .profile-card .auth-button {
+    background: #ffcc33 !important;
+    color: #101b32 !important;
+    border: none !important;
+    font-weight: bold;
+    width: 100%;
+    cursor: pointer;
+}
+
+body.auth-page.profile-page .profile-card .auth-button:hover {
+    background: #ffdb66 !important;
+}
+
+/* Make all profile form areas blue */
+body.auth-page.profile-page .profile-card,
+body.auth-page.profile-page .profile-photo-section,
+body.auth-page.profile-page .profile-field {
+    background: linear-gradient(135deg, #101b32, #263e65) !important;
+    
+}
+
+/* Profile photo upload area */
+body.auth-page.profile-page #profilePhoto {
+    background: #263e65 !important;
+    border: 1px solid #607da8 !important;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+
+/* Make the entire profile form blue */
+body.auth-page.profile-page .profile-card,
+body.auth-page.profile-page .profile-card form,
+body.auth-page.profile-page .profile-photo-section,
+body.auth-page.profile-page .profile-field {
+    background: #263e65 !important;
+    
+}
+
+/* Keep all form fields blue */
+body.auth-page.profile-page .profile-card input:not([type="file"]),
+body.auth-page.profile-page .profile-card textarea,
+body.auth-page.profile-page #profilePhoto {
+    background: #263e65 !important;
+
+    border: 1px solid #607da8 !important;
+}
+
+/* Keep labels white */
+body.auth-page.profile-page .profile-card label {
+    color: #ffffff !important;
+}
+
+/* Keep Update Profile button yellow */
+body.auth-page.profile-page .profile-card .auth-button {
+    background: #ffcc33 !important;
+    color: #101b32 !important;
+    border: none !important;
+}
+
+/* My Profile - match the reference design */
+body.auth-page.profile-page {
+    background: linear-gradient(145deg, #101b32 5%, #0755b8 55%, #168bea 100%) !important;
+    min-height: 100vh;
+}
+
+/* Blue gradient profile card */
+body.auth-page.profile-page .profile-card {
+    background: linear-gradient(145deg, #101b32, #0755b8 60%, #168bea) !important;
+    color: #ffffff !important;
+    border: 1px solid #347fce !important;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* White heading and labels */
+body.auth-page.profile-page .profile-card h1,
+body.auth-page.profile-page .profile-card label,
+body.auth-page.profile-page .profile-card .profile-description {
+    color: #ffffff !important;
+}
+
+/* White text fields, like your screenshot */
+body.auth-page.profile-page .profile-card input:not([type="file"]),
+body.auth-page.profile-page .profile-card textarea {
+    background: #f1f3f6 !important;
+    color: #172033 !important;
+    border: 1px solid #d8deea !important;
+    border-radius: 8px;
+    padding: 12px;
+    box-sizing: border-box;
+}
+
+/* Circular profile photo */
+body.auth-page.profile-page #profilePhotoPreview {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #ffffff;
+}
+
+/* Yellow Update Profile button */
+body.auth-page.profile-page .profile-card .auth-button {
+    background: #ffcc33 !important;
+    color: #172033 !important;
+    border: none !important;
+    border-radius: 10px;
+    width: 100%;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
+/* Fix the white area inside My Profile */
+body.auth-page.profile-page .profile-card form#profileForm {
+    background: linear-gradient(145deg, #101b32, #0755b8 60%, #168bea) !important;
+    padding: 20px !important;
+    border-radius: 12px !important;
+    box-sizing: border-box !important;
+}
+
+/* Remove dark rectangular backgrounds behind labels */
+body.auth-page.profile-page .profile-card form#profileForm > div,
+body.auth-page.profile-page .profile-card .profile-photo-section,
+body.auth-page.profile-page .profile-card .profile-field {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #ffffff !important;
+}
+
+/* Make every label white */
+body.auth-page.profile-page .profile-card label {
+    display: block !important;
+    color: #ffffff !important;
+}
+
+/* Keep text fields white */
+body.auth-page.profile-page .profile-card input:not([type="file"]),
+body.auth-page.profile-page .profile-card textarea {
+    background: #ffffff !important;
+    color: #172033 !important;
+    border: 1px solid #d8deea !important;
+}
+
+/* Keep the upload area blue */
+body.auth-page.profile-page .profile-card input[type="file"] {
+    background: transparent !important;
+    color: #ffffff !important;
+}
+
+/* Keep the Update Profile button yellow */
+body.auth-page.profile-page .profile-card button.auth-button {
+    background: #ffcc33 !important;
+    color: #172033 !important;
+    border: none !important;
+}
+
