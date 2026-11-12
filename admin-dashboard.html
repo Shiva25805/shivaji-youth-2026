@@ -141,14 +141,25 @@
         });
     </script>
     
+         
 <script>
-function readRecords(key) {
-    try {
-        const data = JSON.parse(localStorage.getItem(key) || "[]");
-        return Array.isArray(data) ? data : [];
-    } catch (error) {
-        return [];
+const API_BASE =
+    (location.hostname === "localhost" ||
+     location.hostname === "127.0.0.1")
+        ? "http://127.0.0.1:8080"
+        : "https://shivaji-youth-2026-backend.onrender.com";
+
+async function fetchRecords(endpoint) {
+    const response = await fetch(`${API_BASE}/api/${endpoint}`, {
+        credentials: "include"
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to load ${endpoint}: HTTP ${response.status}`);
     }
+
+    const records = await response.json();
+    return Array.isArray(records) ? records : [];
 }
 
 function money(amount) {
@@ -157,174 +168,163 @@ function money(amount) {
     });
 }
 
-function updateDashboard() {
-    const chanda = readRecords("shivajiChanda");
-    const auctions = readRecords("shivajiAuctions");
-    const events = readRecords("shivajiEvents");
-    const expenses = readRecords("shivajiExpenses");
-    const payments = readRecords("shivajiPayments");
-
-    const chandaReceived = chanda.reduce(
-        (total, item) => total + Number(item.amount || 0), 0
-    );
-
-    const auctionReceived = auctions.reduce(
-        (total, item) => total + Number(item.received || 0), 0
-    );
-
-    const eventAdvances = events.reduce(
-        (total, item) => total + Number(item.advance || 0), 0
-    );
-
-    const expensesPaid = expenses.reduce(
-        (total, item) => total + Number(item.paid || 0), 0
-    );
-
-    const paymentsReceived = payments.reduce(
-        (total, item) => total + Number(item.received || 0), 0
-    );
-
-    const auctionPending = auctions.reduce(
-        (total, item) => total + Math.max(
-            0, Number(item.bid || 0) - Number(item.received || 0)
-        ), 0
-    );
-
-    const paymentPending = payments.reduce(
-        (total, item) => total + Math.max(
-            0, Number(item.due || 0) - Number(item.received || 0)
-        ), 0
-    );
-
-    document.getElementById("chandaTotal").textContent =
-        money(chandaReceived);
-
-    document.getElementById("auctionTotal").textContent =
-        money(auctionReceived);
-
-    document.getElementById("eventTotal").textContent =
-        money(eventAdvances);
-
-    document.getElementById("expenseTotal").textContent =
-        money(expensesPaid);
-
-    document.getElementById("pendingTotal").textContent =
-        money(auctionPending + paymentPending);
-
-    const balance = chandaReceived + auctionReceived +
-        eventAdvances + paymentsReceived - expensesPaid;
-
-    document.getElementById("balanceTotal").textContent =
-        money(balance);
-
-    updateRecentTransactions(chanda, auctions, events, expenses, payments);
+function amountOf(item, ...keys) {
+    for (const key of keys) {
+        if (item[key] !== undefined && item[key] !== null && item[key] !== "") {
+            const value = Number(item[key]);
+            if (Number.isFinite(value)) return value;
+        }
+    }
+    return 0;
 }
 
 function updateRecentTransactions(chanda, auctions, events, expenses, payments) {
     const transactions = [];
 
-    chanda.forEach(item => {
-        transactions.push({
-            date: item.date || "",
-            title: item.name || "Chanda Contribution",
-            type: "Chanda",
-            amount: Number(item.amount || 0),
+    chanda.forEach(item => transactions.push({
+        date: item.date || item.collectionDate || "",
+        title: item.name || item.memberName || "Chanda Contribution",
+        type: "Chanda",
+        amount: amountOf(item, "amount", "amountReceived"),
+        status: "Received"
+    }));
+
+    auctions.forEach(item => {
+        const received = amountOf(item, "amountReceived", "received");
+        if (received > 0) transactions.push({
+            date: item.auctionDate || item.date || "",
+            title: item.itemName || item.item || item.bidderName || "Auction",
+            type: "Auction Payment",
+            amount: received,
             status: "Received"
         });
     });
 
-    auctions.forEach(item => {
-        if (Number(item.received || 0) > 0) {
-            transactions.push({
-                date: item.date || "",
-                title: item.item || item.bidder || "Auction",
-                type: "Auction Payment",
-                amount: Number(item.received || 0),
-                status: "Received"
-            });
-        }
-    });
-
     events.forEach(item => {
-        if (Number(item.advance || 0) > 0) {
-            transactions.push({
-                date: item.date || "",
-                title: item.name || "Event Advance",
-                type: "Event Advance",
-                amount: Number(item.advance || 0),
-                status: "Received"
-            });
-        }
+        const received = amountOf(item, "amountReceived", "advance", "eventAmount");
+        if (received > 0) transactions.push({
+            date: item.eventDate || item.date || "",
+            title: item.eventName || item.name || "Event Collection",
+            type: "Event Collection",
+            amount: received,
+            status: "Received"
+        });
     });
 
     expenses.forEach(item => {
-        if (Number(item.paid || 0) > 0) {
-            transactions.push({
-                date: item.date || "",
-                title: item.title || "Expense",
-                type: item.category || "Expense",
-                amount: Number(item.paid || 0),
-                status: "Paid"
-            });
-        }
+        const paid = amountOf(item, "amountPaid", "paid", "amount");
+        if (paid > 0) transactions.push({
+            date: item.expenseDate || item.date || "",
+            title: item.reason || item.title || item.description || "Expense",
+            type: "Expense",
+            amount: paid,
+            status: "Paid"
+        });
     });
 
     payments.forEach(item => {
-        if (Number(item.received || 0) > 0) {
-            transactions.push({
-                date: item.date || "",
-                title: item.name || "Payment",
-                type: item.purpose || "Payment Record",
-                amount: Number(item.received || 0),
-                status: "Received"
-            });
-        }
+        const received = amountOf(item, "amountReceived", "received", "amount");
+        if (received > 0) transactions.push({
+            date: item.paymentDate || item.date || "",
+            title: item.memberName || item.name || item.purpose || "Payment",
+            type: item.purpose || "Payment",
+            amount: received,
+            status: "Received"
+        });
     });
 
-    transactions.sort((a, b) => b.date.localeCompare(a.date));
+    transactions.sort((a, b) => String(b.date).localeCompare(String(a.date)));
 
     const table = document.getElementById("transactionTable");
-    if (!table) return;
-
     table.replaceChildren();
 
     if (transactions.length === 0) {
-        const row = document.createElement("tr");
-        const cell = document.createElement("td");
-
+        const row = table.insertRow();
+        const cell = row.insertCell();
         cell.colSpan = 5;
-        cell.textContent = "No transactions recorded yet.";
         cell.className = "empty-state";
-
-        row.appendChild(cell);
-        table.appendChild(row);
+        cell.textContent = "No transactions recorded yet.";
         return;
     }
 
     transactions.slice(0, 10).forEach(item => {
-        const row = document.createElement("tr");
-
-        [
-            item.date || "—",
-            item.title,
-            item.type,
-            money(item.amount),
-            item.status
-        ].forEach(value => {
-            const cell = document.createElement("td");
-            cell.textContent = value;
-            row.appendChild(cell);
-        });
-
-        table.appendChild(row);
+        const row = table.insertRow();
+        [item.date || "—", item.title, item.type, money(item.amount), item.status]
+            .forEach(value => {
+                row.insertCell().textContent = value;
+            });
     });
 }
 
-document.addEventListener("DOMContentLoaded", updateDashboard);
+async function updateDashboard() {
+    try {
+        const [chanda, auctions, events, expenses, payments] = await Promise.all([
+            fetchRecords("chanda"),
+            fetchRecords("auctions"),
+            fetchRecords("events"),
+            fetchRecords("expenses"),
+            fetchRecords("payments")
+        ]);
 
-// Update the dashboard when another browser tab changes saved records.
-window.addEventListener("storage", updateDashboard);
+        const chandaReceived = chanda.reduce(
+            (sum, item) => sum + amountOf(item, "amount", "amountReceived"), 0
+        );
+
+        const auctionReceived = auctions.reduce(
+            (sum, item) => sum + amountOf(item, "amountReceived", "received"), 0
+        );
+
+        const eventReceived = events.reduce(
+            (sum, item) => sum + amountOf(item, "amountReceived", "advance"), 0
+        );
+
+        const expensesPaid = expenses.reduce(
+            (sum, item) => sum + amountOf(item, "amountPaid", "paid", "amount"), 0
+        );
+
+        const paymentsReceived = payments.reduce(
+            (sum, item) => sum + amountOf(item, "amountReceived", "received", "amount"), 0
+        );
+
+        const auctionPending = auctions.reduce((sum, item) =>
+            sum + Math.max(
+                0,
+                amountOf(item, "winningBid", "bid") -
+                amountOf(item, "amountReceived", "received")
+            ), 0
+        );
+
+        const paymentPending = payments.reduce((sum, item) =>
+            sum + Math.max(
+                0,
+                amountOf(item, "totalAmount", "amountDue", "due", "amount") -
+                amountOf(item, "amountReceived", "received")
+            ), 0
+        );
+
+        document.getElementById("chandaTotal").textContent = money(chandaReceived);
+        document.getElementById("auctionTotal").textContent = money(auctionReceived);
+        document.getElementById("eventTotal").textContent = money(eventReceived);
+        document.getElementById("expenseTotal").textContent = money(expensesPaid);
+        document.getElementById("pendingTotal").textContent =
+            money(auctionPending + paymentPending);
+
+        document.getElementById("balanceTotal").textContent = money(
+            chandaReceived + auctionReceived + eventReceived +
+            paymentsReceived - expensesPaid
+        );
+
+        updateRecentTransactions(chanda, auctions, events, expenses, payments);
+    } catch (error) {
+        console.error("Admin dashboard loading error:", error);
+        document.getElementById("transactionTable").innerHTML =
+            '<tr><td colspan="5">Unable to load transactions. Check login and backend access.</td></tr>';
+    }
+}
+
+document.addEventListener("DOMContentLoaded", updateDashboard);
 </script>
+
 </body>
 </html>
 

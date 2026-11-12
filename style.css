@@ -428,11 +428,16 @@ footer {
     font-size: 14px;
 }
 
+
 .summary-card h2 {
     margin: 12px 0 8px;
-    font-size: 25px;
+    font-size: 30px;
+    font-weight: 800;
+    color: #ffffff;
     overflow-wrap: anywhere;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.25);
 }
+
 
 .summary-card p {
     color: #7b8799;
@@ -2781,3 +2786,32 @@ body.auth-page.profile-page .profile-card button.auth-button {
     border: none !important;
 }
 
+
+/* Bright financial totals on Admin Dashboard */
+.dashboard-body .summary-card h2 {
+    color: #ffdf00 !important;
+    font-size: 32px !important;
+    font-weight: 900 !important;
+    opacity: 1 !important;
+    text-shadow:
+        0 0 5px rgba(255, 223, 0, 0.8),
+        0 0 12px rgba(255, 223, 0, 0.5) !important;
+    filter: brightness(1.5) !important;
+}
+
+/* Admin dashboard totals - solid black */
+body.dashboard-body .summary-card h2,
+body.dashboard-body .summary-card h2#chandaTotal,
+body.dashboard-body .summary-card h2#auctionTotal,
+body.dashboard-body .summary-card h2#eventTotal,
+body.dashboard-body .summary-card h2#expenseTotal,
+body.dashboard-body .summary-card h2#pendingTotal,
+body.dashboard-body .summary-card h2#balanceTotal {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    font-size: 32px !important;
+    font-weight: 900 !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+    filter: none !important;
+}

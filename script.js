@@ -27,21 +27,26 @@ if (adminForm) {
         const password = document.getElementById("adminPassword").value;
         const adminMessage = document.getElementById("adminMessage");
 
-        try {
-            const response = await fetch(
-                "http://127.0.0.1:8080/api/auth/login",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    credentials: "include",
-                    body: JSON.stringify({
-                        email: email,
-                        password: password
-                    })
-                }
-            );
+            
+try {
+    const response = await fetch(
+        (location.hostname === "localhost" ||
+         location.hostname === "127.0.0.1")
+            ? "http://127.0.0.1:8080/api/auth/login"
+            : "https://shivaji-youth-2026-backend.onrender.com/api/auth/login",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include",
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
+        }
+    );
+
 
             if (response.ok) {
                 sessionStorage.setItem("shivajiAdminLoggedIn", "true");

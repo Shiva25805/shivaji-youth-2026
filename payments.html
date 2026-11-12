@@ -225,12 +225,18 @@
                   
 async function loadPayments() {
     try {
-        const response = await fetch(
-            "http://localhost:8080/api/payments",
-            {
-                credentials: "include"
-            }
-        );
+             
+const response = await fetch(
+    (location.hostname === "localhost" ||
+     location.hostname === "127.0.0.1")
+        ? "http://127.0.0.1:8080/api/payments"
+        : "https://shivaji-youth-2026-backend.onrender.com/api/payments",
+    {
+        credentials: "include"
+    }
+);
+
+        
 
         if (!response.ok) {
             throw new Error("Failed to load payments.");
@@ -313,19 +319,26 @@ paymentForm.addEventListener("submit", async function(event) {
     const isEditing = editIndex !== undefined;
 
     try {
-        const response = await fetch(
-            isEditing
-                ? `http://localhost:8080/api/payments/${payments[Number(editIndex)].id}`
-                : "http://localhost:8080/api/payments",
-            {
-                method: isEditing ? "PUT" : "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payment)
-            }
-        );
+            
+const response = await fetch(
+    (location.hostname === "localhost" ||
+     location.hostname === "127.0.0.1")
+        ? (isEditing
+            ? `http://127.0.0.1:8080/api/payments/${payments[Number(editIndex)].id}`
+            : "http://127.0.0.1:8080/api/payments")
+        : (isEditing
+            ? `https://shivaji-youth-2026-backend.onrender.com/api/payments/${payments[Number(editIndex)].id}`
+            : "https://shivaji-youth-2026-backend.onrender.com/api/payments"),
+    {
+        method: isEditing ? "PUT" : "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payment)
+    }
+);
+
 
         if (!response.ok) {
             throw new Error(`Request failed: ${response.status}`);

@@ -170,8 +170,14 @@
 async function loadEvents() {
     try {
         const response = await fetch(
-            "http://localhost:8080/api/events",
-            { credentials: "include" }
+               (location.hostname === "localhost" ||
+ location.hostname === "127.0.0.1")
+    ? "http://127.0.0.1:8080/api/events"
+    : "https://shivaji-youth-2026-backend.onrender.com/api/events",
+            {
+                credentials: "include"
+            }
+        
         );
 
         if (!response.ok) {
@@ -263,13 +269,17 @@ eventForm.addEventListener("submit", async function(event) {
 
     try {
         const response = await fetch(
-            "http://localhost:8080/api/events",
+                     (location.hostname === "localhost" ||
+                    location.hostname === "127.0.0.1")
+                    ? "http://127.0.0.1:8080/api/events"
+                : "https://shivaji-youth-2026-backend.onrender.com/api/events",
             {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newEvent)
             }
+            
         );
 
         if (!response.ok) {

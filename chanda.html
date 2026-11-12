@@ -186,7 +186,12 @@
            
 async function loadChanda() {
     try {
-        const response = await fetch("http://localhost:8080/api/chanda", {
+               const response = await fetch(
+    (location.hostname === "localhost" ||
+     location.hostname === "127.0.0.1")
+        ? "http://127.0.0.1:8080/api/chanda"
+        : "https://shivaji-youth-2026-backend.onrender.com/api/chanda",
+    {
             credentials: "include"
         });
 
@@ -282,7 +287,12 @@ async function loadChanda() {
 
             
             try {
-                const response = await fetch("http://localhost:8080/api/chanda", {
+                   const response = await fetch(
+    (location.hostname === "localhost" ||
+     location.hostname === "127.0.0.1")
+        ? "http://127.0.0.1:8080/api/chanda"
+        : "https://shivaji-youth-2026-backend.onrender.com/api/chanda",
+    {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
