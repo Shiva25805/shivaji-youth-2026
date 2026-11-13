@@ -249,11 +249,17 @@
             `).join("");
         }
                     
+         
 async function loadExpenses() {
     try {
         const response = await fetch(
-            "http://localhost:8080/api/expenses",
-            { credentials: "include" }
+            (location.hostname === "localhost" ||
+             location.hostname === "127.0.0.1")
+                ? "http://127.0.0.1:8080/api/expenses"
+                : "https://shivaji-youth-2026-backend.onrender.com/api/expenses",
+            {
+                credentials: "include"
+            }
         );
 
         if (!response.ok) {
@@ -269,6 +275,7 @@ async function loadExpenses() {
             "Could not load expenses. Check the backend and admin login.";
     }
 }
+
            
              
 expenseForm.addEventListener("submit", async function(event) {
