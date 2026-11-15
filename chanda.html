@@ -191,7 +191,8 @@ async function loadChanda() {
      location.hostname === "127.0.0.1")
         ? "http://127.0.0.1:8080/api/chanda"
         : "https://shivaji-youth-2026-backend.onrender.com/api/chanda",
-    {
+        {
+            method: "GET",
             credentials: "include"
         });
 

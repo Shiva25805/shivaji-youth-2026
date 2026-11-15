@@ -232,6 +232,7 @@ const response = await fetch(
         ? "http://127.0.0.1:8080/api/payments"
         : "https://shivaji-youth-2026-backend.onrender.com/api/payments",
     {
+        method: "GET",
         credentials: "include"
     }
 );

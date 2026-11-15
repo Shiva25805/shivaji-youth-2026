@@ -258,6 +258,7 @@ async function loadExpenses() {
                 ? "http://127.0.0.1:8080/api/expenses"
                 : "https://shivaji-youth-2026-backend.onrender.com/api/expenses",
             {
+                method: "GET",
                 credentials: "include"
             }
         );
