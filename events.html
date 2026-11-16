@@ -318,13 +318,16 @@ async function deleteEvent(index) {
     }
 
     try {
-        const response = await fetch(
-            `http://localhost:8080/api/events/${eventId}`,
-            {
-                method: "DELETE",
-                credentials: "include"
-            }
-        );
+           const response = await fetch(
+    (location.hostname === "localhost" ||
+     location.hostname === "127.0.0.1")
+        ? `http://127.0.0.1:8080/api/events/${eventId}`
+        : `https://shivaji-youth-2026-backend.onrender.com/api/events/${eventId}`,
+    {
+        method: "DELETE",
+        credentials: "include"
+    }
+);
 
         if (!response.ok) {
             throw new Error("Delete failed: " + response.status);

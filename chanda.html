@@ -335,13 +335,18 @@ async function deleteContribution(index) {
     }
 
     try {
-        const response = await fetch(
-            `http://localhost:8080/api/chanda/${contribution.id}`,
-            {
-                method: "DELETE",
-                credentials: "include"
-            }
-        );
+          
+const response = await fetch(
+    (location.hostname === "localhost" ||
+     location.hostname === "127.0.0.1")
+        ? `http://127.0.0.1:8080/api/chanda/${contribution.id}`
+        : `https://shivaji-youth-2026-backend.onrender.com/api/chanda/${contribution.id}`,
+    {
+        method: "DELETE",
+        credentials: "include"
+    }
+);
+
 
         if (!response.ok) {
             throw new Error("Failed to delete contribution.");

@@ -706,39 +706,42 @@ if (nameElement) {
     displayLoggedInMember();
 </script>
 
-<script>
       
+<script>
 const logoutButton = document.getElementById("memberLogoutBtn");
 
 if (logoutButton) {
     logoutButton.addEventListener("click", async function () {
-        const confirmLogout = confirm("Are you sure you want to log out?");
-
-        if (!confirmLogout) {
+        if (!confirm("Are you sure you want to log out?")) {
             return;
         }
 
         try {
             const response = await fetch(
-                "http://localhost:8080/api/auth/logout",
+                "http://127.0.0.1:8080/api/auth/logout",
                 {
                     method: "POST",
-                    credentials: "include"
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: "{}"
                 }
             );
 
             if (response.ok) {
                 window.location.replace("user-login.html");
             } else {
-                alert("Logout failed. Please try again.");
+                const message = await response.text();
+                console.error("Logout failed:", response.status, message);
+                alert("Logout failed: HTTP " + response.status);
             }
         } catch (error) {
             console.error("Logout error:", error);
-            alert("Cannot connect to the backend. Please check that it is running.");
+            alert("Cannot connect to the backend.");
         }
     });
 }
-
 </script>
 
 <script>
