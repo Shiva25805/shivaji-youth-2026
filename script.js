@@ -79,7 +79,10 @@ if (userForm) {
 
         try {
             const response = await fetch(
-                "http://127.0.0.1:8080/api/auth/login",
+                (location.hostname === "localhost" ||
+                location.hostname === "127.0.0.1")
+                ? "http://127.0.0.1:8080/api/auth/login"
+                : "https://shivaji-youth-2026-backend.onrender.com/api/auth/login",
                 {
                     method: "POST",
                     headers: {
