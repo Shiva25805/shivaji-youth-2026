@@ -101,12 +101,10 @@
                  alt="Bathukamma celebration">
             <h3>Bathukamma Celebration</h3>
         </article>
-        </article>
         <article class="card gallery-card">
             <img src="https://imgs.search.brave.com/7DEFVFmH7aUvay3-ywAf1r53qcCwAjnsnwqBtW0BehE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5pc3RvY2twaG90/by5jb20vaWQvOTk0/MjY5NzA0L3Bob3Rv/L2thYmFkZGktYXQt/c2hvb2xpbmktZmFp/ci1pbi10aG9kby1n/cm91bmQtc29sYW4t/aGltYWNoYWwtcHJh/ZGVzaC5qcGc_cz02/MTJ4NjEyJnc9MCZr/PTIwJmM9LTFKY0p2/RmlnUTJsaTRMTVI5/TXJKSU1YS28xZEdx/QTFtQzBsVGFVRDRa/ST0"
                  alt="Sports and Games Activities">
             <h3>Sports and Games Activities</h3>
-        </article>
         </article>
         <article class="card gallery-card">
             <img src="https://imgs.search.brave.com/K7ngE6u-_IbSt0efn2zjmp8XdGTBbjkveS6Ymsa1tpU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/dGhlYXJ0YXJlbmEu/Y29tL3N0b3JhZ2Uv/YmxvZ3Mvc2Nob29s/LWNvbXBpdGlvbi53/ZWJw"
@@ -191,67 +189,14 @@
 
     <script src="script.js"></script>
 
-    <script>
-        menuToggle.addEventListener("click", function () {
-    const isOpen = mainNav.classList.toggle("show");
-
-    menuToggle.setAttribute("aria-expanded", isOpen);
-    menuToggle.setAttribute(
-        "aria-label",
-        isOpen ? "Close navigation menu" : "Open navigation menu"
-    );
-
-    menuToggle.textContent = isOpen ? "✕" : "☰";
-});
-
-const navLinks = document.querySelectorAll("#mainNav a");
-
-navLinks.forEach(function (link) {
-    link.addEventListener("click", function () {
-        navLinks.forEach(function (item) {
-            item.classList.remove("active");
-        });
-
-        link.classList.add("active");
-
-        mainNav.classList.remove("show");
-        menuToggle.textContent = "☰";
-        menuToggle.setAttribute("aria-expanded", "false");
-        menuToggle.setAttribute("aria-label", "Open navigation menu");
-    });
-});
-
-const themeToggle = document.getElementById("themeToggle");
-
-if (localStorage.getItem("shivajiTheme") === "dark") {
-    document.body.classList.add("dark-mode");
-}
-
-function updateThemeButton() {
-    if (document.body.classList.contains("dark-mode")) {
-        themeToggle.textContent = "☀️ Light Mode";
-    } else {
-        themeToggle.textContent = "🌙 Dark Mode";
-    }
-}
-
-updateThemeButton();
-
-themeToggle.addEventListener("click", function () {
-    document.body.classList.toggle("dark-mode");
-
-    const isDark = document.body.classList.contains("dark-mode");
-    localStorage.setItem("shivajiTheme", isDark ? "dark" : "light");
-
-    updateThemeButton();
-});
-</script>
-
+           
 
 <script>
 const menuToggle = document.getElementById("menuToggle");
 const mainNav = document.getElementById("mainNav");
+const themeToggle = document.getElementById("themeToggle");
 
+// Mobile navigation — only one click handler
 menuToggle.addEventListener("click", function () {
     const isOpen = mainNav.classList.toggle("show");
 
@@ -260,8 +205,46 @@ menuToggle.addEventListener("click", function () {
         "aria-label",
         isOpen ? "Close navigation menu" : "Open navigation menu"
     );
-
     menuToggle.textContent = isOpen ? "✕" : "☰";
+});
+
+// Close menu after clicking a link
+mainNav.querySelectorAll("a").forEach(function (link) {
+    link.addEventListener("click", function () {
+        mainNav.classList.remove("show");
+        menuToggle.textContent = "☰";
+        menuToggle.setAttribute("aria-expanded", "false");
+        menuToggle.setAttribute("aria-label", "Open navigation menu");
+    });
+});
+
+// Restore saved theme
+if (localStorage.getItem("shivajiTheme") === "dark") {
+    document.body.classList.add("dark-mode");
+}
+
+// Update theme button text
+function updateThemeButton() {
+    themeToggle.textContent =
+        document.body.classList.contains("dark-mode")
+            ? "☀️ Light Mode"
+            : "🌙 Dark Mode";
+}
+
+updateThemeButton();
+
+// Dark mode toggle
+themeToggle.addEventListener("click", function () {
+    document.body.classList.toggle("dark-mode");
+
+    const isDark = document.body.classList.contains("dark-mode");
+
+    localStorage.setItem(
+        "shivajiTheme",
+        isDark ? "dark" : "light"
+    );
+
+    updateThemeButton();
 });
 </script>
 

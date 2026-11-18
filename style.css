@@ -316,8 +316,15 @@ footer {
 
 .dashboard-body {
     min-height: 100vh;
+    margin: 0;
+    padding: 0;
     background: #f4f6fb;
     color: #172033;
+    box-sizing: border-box;
+}
+
+.dashboard-body * {
+    box-sizing: border-box;
 }
 
 .sidebar {
@@ -2815,3 +2822,96 @@ body.dashboard-body .summary-card h2#balanceTotal {
     text-shadow: none !important;
     filter: none !important;
 }
+
+/* Mobile hamburger menu */
+.menu-toggle {
+    display: none;
+}
+
+@media screen and (max-width: 700px) {
+    .navbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .menu-toggle {
+        display: block;
+        margin-left: auto;
+        padding: 8px 12px;
+        font-size: 24px;
+        color: white;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        position: relative;
+        z-index: 1001;
+    }
+
+    nav#mainNav {
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 12px;
+        padding: 12px;
+    }
+
+    nav#mainNav.show {
+        display: flex;
+    }
+
+    nav#mainNav a {
+        display: block;
+        padding: 10px;
+    }
+}
+/* Hide Related Event label on all screen sizes */
+#relatedEventLabel,
+.related-event-label {
+    display: none !important;
+}
+
+@media screen and (max-width: 700px) {
+    .dashboard-body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
+
+    .dashboard-main {
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+        padding: 16px;
+        box-sizing: border-box;
+    }
+
+    .dashboard-header {
+        height: auto;
+        min-height: 0;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .dashboard-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .dashboard-charts {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .dashboard-panel,
+    .chart-panel {
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .dashboard-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+}
+

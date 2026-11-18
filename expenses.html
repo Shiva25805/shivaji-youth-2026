@@ -98,13 +98,6 @@
     </div>
 
     <div class="expense-form-field">
-        <label for="expenseEvent">Related Event (optional)</label>
-        <select id="expenseEvent">
-            <option value="">Select related event</option>
-        </select>
-    </div>
-
-    <div class="expense-form-field">
         <label for="vendorName">Vendor / Person Paid (optional)</label>
         <input type="text" id="vendorName"
                placeholder="Enter vendor or recipient name">
@@ -163,7 +156,6 @@
                             <th>Date</th>
                             <th>Description</th>
                             <th>Category</th>
-                            <th>Event</th>
                             <th>Total</th>
                             <th>Paid</th>
                             <th>Remaining</th>
@@ -236,7 +228,6 @@
                     <td>${safeText(item.date)}</td>
                     <td>${safeText(item.title)}</td>
                     <td>${safeText(item.category)}</td>
-                    <td>${safeText(item.event || "-")}</td>
                     <td>${money(item.amount)}</td>
                     <td>${money(item.paid)}</td>
                     <td>${money(item.amount - item.paid)}</td>
@@ -285,7 +276,6 @@ expenseForm.addEventListener("submit", async function(event) {
     const title = document.getElementById("expenseTitle").value.trim();
     const date = document.getElementById("expenseDate").value;
     const category = document.getElementById("expenseCategory").value;
-    const relatedEvent = document.getElementById("expenseEvent").value.trim();
     const vendor = document.getElementById("vendorName").value.trim();
     const amount = Number(document.getElementById("expenseAmount").value);
     const paid = Number(document.getElementById("expensePaid").value);
@@ -304,7 +294,6 @@ expenseForm.addEventListener("submit", async function(event) {
         title,
         date,
         category,
-        event: relatedEvent,
         vendor,
         amount,
         paid,
