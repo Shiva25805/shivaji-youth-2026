@@ -171,35 +171,22 @@
             }
         }
 
-        @media print {
-            body * {
-                visibility: hidden !important;
-            }
+         
+@media print {
+    body,
+    body * {
+        color: #000000 !important;
+        font-weight: 700 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
 
-            #receiptPaper, #receiptPaper * {
-                visibility: visible !important;
-            }
+    p, span, div, td, th, label {
+        color: #000000 !important;
+        font-weight: 700 !important;
+    }
+}
 
-            #receiptPaper {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                box-shadow: none;
-                border: 1px solid #bbb;
-                padding: 25px;
-                color: black;
-            }
-
-            .receipt-actions, .no-print {
-                display: none !important;
-            }
-
-            @page {
-                size: A4;
-                margin: 15mm;
-            }
-        }
     </style>
 </head>
 
