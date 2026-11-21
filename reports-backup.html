@@ -1,0 +1,372 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports | Shivaji Youth 2026</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-body">
+
+    <aside class="sidebar">
+        <h2>🟠 Shivaji Youth</h2>
+        <p class="sidebar-subtitle">Management System</p>
+
+        <nav class="side-nav">
+            <a href="admin-dashboard.html">📊 Dashboard</a>
+            <a href="events.html">🎉 Events</a>
+            <a href="members.html">👥 Members</a>
+            <a href="chanda.html">💰 Chanda Collections</a>
+            <a href="auctions.html">🔨 Auctions</a>
+            <a href="expenses.html">🧾 Expenses</a>
+            <a href="payments.html">💳 Payments</a>
+            <a class="active" href="reports.html">📈 Reports</a>
+        </nav>
+
+        <a class="logout-link" href="admin-login.html">↩ Logout</a>
+    </aside>
+
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <div>
+                <h1>Financial Reports</h1>
+                <p>Review the records saved in this browser.</p>
+            </div>
+            <span class="admin-badge">Administrator</span>
+        </header>
+
+        <section class="summary-grid">
+            <article class="summary-card">
+                <span>Chanda Received</span>
+                <h2 id="reportChanda">₹0</h2>
+            </article>
+
+            <article class="summary-card">
+                <span>Auction Payments Received</span>
+                <h2 id="reportAuction">₹0</h2>
+            </article>
+
+            <article class="summary-card">
+                <span>Event Amounts Recorded</span>
+                <h2 id="reportEvents">₹0</h2>
+                <p>Planned event totals, not necessarily paid</p>
+            </article>
+
+            <article class="summary-card">
+                <span>Expenses Paid</span>
+                <h2 id="reportExpenses">₹0</h2>
+            </article>
+
+            <article class="summary-card">
+                <span>Separate Payment Records Received</span>
+                <h2 id="reportPayments">₹0</h2>
+            </article>
+
+            <article class="summary-card balance-card">
+                <span>Recorded Net Cash Flow</span>
+                <h2 id="reportBalance">₹0</h2>
+                <p>Recorded income received minus expenses paid</p>
+            </article>
+        </section>
+
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+                <h2>Report Filters</h2>
+                <p>Filter transactions by date.</p>
+            </div>
+
+            <form id="filterForm">
+                <label for="fromDate">From Date</label>
+                <input type="date" id="fromDate">
+
+                <label for="toDate">To Date</label>
+                <input type="date" id="toDate">
+
+                <button type="submit" class="primary-btn">
+                    Apply Filter
+                </button>
+
+                <button type="button" id="clearFilter">
+                    Clear Filter
+                </button>
+            </form>
+            <p id="filterMessage" class="form-message"></p>
+        </section>
+
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+                <h2>Financial Summary</h2>
+                <p>Income and expense totals for the selected period.</p>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Amount (₹)</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summaryTable"></tbody>
+                </table>
+            </div>
+
+            <div class="quick-actions">
+                <button type="button" id="exportButton">
+                    Export CSV Report
+                </button>
+                <button type="button" onclick="window.print()">
+                    Print Report
+                </button>
+            </div>
+        </section>
+
+        <section class="dashboard-panel">
+            <div class="panel-heading">
+                <h2>Transaction Details</h2>
+                <p>Recorded received amounts and expenses paid.</p>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Money In (₹)</th>
+                            <th>Money Out (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTable"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const readRecords = key => {
+            try {
+                const data = JSON.parse(localStorage.getItem(key) || "[]");
+                return Array.isArray(data) ? data : [];
+            } catch {
+                return [];
+            }
+        };
+
+        const chanda = readRecords("shivajiChanda");
+        const auctions = readRecords("shivajiAuctions");
+        const events = readRecords("shivajiEvents");
+        const expenses = readRecords("shivajiExpenses");
+        const payments = readRecords("shivajiPayments");
+
+        let filteredTransactions = [];
+
+        function money(amount) {
+            return "₹" + amount.toLocaleString("en-IN", {
+                maximumFractionDigits: 2
+            });
+        }
+
+        function safeText(value) {
+            return String(value ?? "").replace(/[&<>"']/g, ch => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[ch]);
+        }
+
+        function makeTransactions() {
+            const transactions = [];
+
+            chanda.forEach(item => {
+                transactions.push({
+                    date: item.date,
+                    category: "Chanda",
+                    description: item.name + " - " + item.purpose,
+                    income: Number(item.amount) || 0,
+                    expense: 0
+                });
+            });
+
+            auctions.forEach(item => {
+                transactions.push({
+                    date: item.date,
+                    category: "Auction",
+                    description: item.item + " - " + item.bidder,
+                    income: Number(item.received) || 0,
+                    expense: 0
+                });
+            });
+
+            expenses.forEach(item => {
+                transactions.push({
+                    date: item.date,
+                    category: "Expense: " + item.category,
+                    description: item.title,
+                    income: 0,
+                    expense: Number(item.paid) || 0
+                });
+            });
+
+            payments.forEach(item => {
+                transactions.push({
+                    date: item.date,
+                    category: "Separate Payment",
+                    description: item.name + " - " + item.purpose,
+                    income: Number(item.received) || 0,
+                    expense: 0
+                });
+            });
+
+            return transactions;
+        }
+
+        function renderReport() {
+            const from = document.getElementById("fromDate").value;
+            const to = document.getElementById("toDate").value;
+
+            const transactions = makeTransactions().filter(item => {
+                return (!from || item.date >= from) &&
+                       (!to || item.date <= to);
+            });
+
+            filteredTransactions = transactions;
+
+            const incomeFor = category =>
+                transactions
+                    .filter(item => item.category === category)
+                    .reduce((sum, item) => sum + item.income, 0);
+
+            const expensesPaid = transactions.reduce(
+                (sum, item) => sum + item.expense, 0
+            );
+
+            const chandaTotal = incomeFor("Chanda");
+            const auctionTotal = incomeFor("Auction");
+            const paymentTotal = incomeFor("Separate Payment");
+
+            const eventTotal = events
+                .filter(item => (!from || item.date >= from) &&
+                                (!to || item.date <= to))
+                .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+
+            document.getElementById("reportChanda").textContent =
+                money(chandaTotal);
+            document.getElementById("reportAuction").textContent =
+                money(auctionTotal);
+            document.getElementById("reportEvents").textContent =
+                money(eventTotal);
+            document.getElementById("reportExpenses").textContent =
+                money(expensesPaid);
+            document.getElementById("reportPayments").textContent =
+                money(paymentTotal);
+            document.getElementById("reportBalance").textContent =
+                money(chandaTotal + auctionTotal + paymentTotal - expensesPaid);
+
+            const summaries = [
+                ["Chanda received", chandaTotal, "Income"],
+                ["Auction payments received", auctionTotal, "Income"],
+                ["Separate payment records received", paymentTotal, "Income"],
+                ["Expenses paid", expensesPaid, "Expense"],
+                ["Recorded net cash flow", chandaTotal + auctionTotal +
+                    paymentTotal - expensesPaid, "Net"]
+            ];
+
+            document.getElementById("summaryTable").innerHTML =
+                summaries.map(row => `
+                    <tr>
+                        <td>${safeText(row[0])}</td>
+                        <td>${money(row[1])}</td>
+                        <td>${safeText(row[2])}</td>
+                    </tr>
+                `).join("") + `
+                    <tr>
+                        <td>Event planned totals (not income)</td>
+                        <td>${money(eventTotal)}</td>
+                        <td>Planning</td>
+                    </tr>`;
+
+            const transactionTable = document.getElementById("transactionTable");
+
+            if (transactions.length === 0) {
+                transactionTable.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            No transactions found for this date range.
+                        </td>
+                    </tr>`;
+            } else {
+                transactionTable.innerHTML = transactions.map(item => `
+                    <tr>
+                        <td>${safeText(item.date)}</td>
+                        <td>${safeText(item.category)}</td>
+                        <td>${safeText(item.description)}</td>
+                        <td>${money(item.income)}</td>
+                        <td>${money(item.expense)}</td>
+                    </tr>
+                `).join("");
+            }
+        }
+
+        document.getElementById("filterForm").addEventListener(
+            "submit", function(event) {
+                event.preventDefault();
+
+                const from = document.getElementById("fromDate").value;
+                const to = document.getElementById("toDate").value;
+                const message = document.getElementById("filterMessage");
+
+                if (from && to && from > to) {
+                    message.textContent =
+                        "From Date cannot be later than To Date.";
+                    return;
+                }
+
+                message.textContent = "Report updated.";
+                renderReport();
+            }
+        );
+
+        document.getElementById("clearFilter").addEventListener("click", function() {
+            document.getElementById("filterForm").reset();
+            document.getElementById("filterMessage").textContent =
+                "Showing all dates.";
+            renderReport();
+        });
+
+        document.getElementById("exportButton").addEventListener("click", function() {
+            const rows = [
+                ["Date", "Category", "Description", "Money In", "Money Out"],
+                ...filteredTransactions.map(item => [
+                    item.date, item.category, item.description,
+                    item.income, item.expense
+                ])
+            ];
+
+            const csv = rows.map(row =>
+                row.map(value =>
+                    '"' + String(value ?? "").replace(/"/g, '""') + '"'
+                ).join(",")
+            ).join("\r\n");
+
+            const blob = new Blob(["\uFEFF" + csv], {
+                type: "text/csv;charset=utf-8;"
+            });
+
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "shivaji-youth-financial-report.csv";
+            link.click();
+            URL.revokeObjectURL(url);
+        });
+
+        renderReport();
+    </script>
+</body>
+</html>

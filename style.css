@@ -3031,3 +3031,9 @@ body.dashboard-body .summary-card h2#balanceTotal {
         overflow-x: auto;
     }
 }
+
+/* Move the Cancel button down */
+.cancel-btn {
+    margin-top: 15px;
+}
+
