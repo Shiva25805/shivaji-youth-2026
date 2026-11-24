@@ -147,7 +147,7 @@ async function loadProfile() {
         selectedProfilePhoto = profile.profilePhoto || "";
 
         profilePhotoPreview.src =
-            selectedProfilePhoto || "Images/default-profile.png";
+            selectedProfilePhoto || "/Images/default-profile.svg";
 
         localStorage.setItem(
             "shivajiMemberProfile",
@@ -163,7 +163,7 @@ async function loadProfile() {
     } catch (error) {
         console.error("Profile load error:", error);
         profileMessage.textContent =
-            "Cannot connect to the backend. Check that it is running.";
+            "Unable to connect to the server. Please try again.";
     }
 }
 
