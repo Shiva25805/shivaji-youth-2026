@@ -4,72 +4,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>My Profile | Shivaji Youth</title>
     <link rel="stylesheet" href="style.css">
-       <style>
-    .profile-photo-section {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-        margin: 20px 0 25px;
-    }
 
-    #profilePhotoPreview {
-        width: 140px;
-        height: 140px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid #ddd;
-    }
+    <style>
+        .profile-photo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0 25px;
+        }
 
-    #profilePhoto {
-        max-width: 100%;
-    }
-</style>
+        #profilePhotoPreview {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ddd;
+        }
+
+        #profilePhoto {
+            display: none;
+        }
+
+        #editPhotoBtn {
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .profile-field {
+            margin-bottom: 16px;
+        }
+
+        .profile-field label {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .profile-field input,
+        .profile-field textarea {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #profileMessage {
+            overflow-wrap: anywhere;
+        }
+    </style>
 </head>
-            <body class="auth-page profile-page">
+
+<body class="auth-page profile-page">
 
     <div class="profile-card">
 
-         
-<div class="profile-photo-section">
-    <img
-        id="profilePhotoPreview"
-        src="/Images/default-profile.svg"
-        alt="Profile photo"
-    >
-
-    <input
-        type="file"
-        id="profilePhoto"
-        accept="image/*"
-        hidden
-    >
-
-    <button type="button" class="auth-button" id="editPhotoBtn">
-        Edit Photo
-    </button>
-
-    <small>Choose an image up to 5 MB.</small>
-</div>
-
-
         <h1>My Profile</h1>
-        <p class="profile-description">Manage and update your member information.</p>
+        <p class="profile-description">
+            Manage and update your member information.
+        </p>
 
         <form id="profileForm">
 
+            <!-- Profile Photo -->
             <div class="profile-photo-section">
-                <label for="profilePhoto">Profile Photo</label>
+
+                <img
+                    id="profilePhotoPreview"
+                    src="/Images/default-profile.svg"
+                    alt="Profile photo"
+                >
+
                 <input
                     type="file"
                     id="profilePhoto"
                     accept="image/*"
                 >
+
+                <button
+                    type="button"
+                    class="auth-button"
+                    id="editPhotoBtn"
+                >
+                    Edit Photo
+                </button>
+
                 <small>Choose an image up to 5 MB.</small>
             </div>
 
+            <!-- Full Name -->
             <div class="profile-field">
                 <label for="profileName">Full Name</label>
                 <input
@@ -80,6 +103,7 @@
                 >
             </div>
 
+            <!-- Email -->
             <div class="profile-field">
                 <label for="profileEmail">Email</label>
                 <input
@@ -90,6 +114,7 @@
                 >
             </div>
 
+            <!-- Phone -->
             <div class="profile-field">
                 <label for="profilePhone">Phone Number</label>
                 <input
@@ -102,6 +127,7 @@
                 >
             </div>
 
+            <!-- Address -->
             <div class="profile-field">
                 <label for="profileAddress">Address</label>
                 <textarea
@@ -117,102 +143,140 @@
 
         </form>
 
-        <p id="profileMessage" class="form-message" aria-live="polite"></p>
+        <p
+            id="profileMessage"
+            class="form-message"
+            aria-live="polite"
+        ></p>
 
     </div>
 
+    <script>
+        const API_URL =
+            "https://shivaji-youth-2026-backend.onrender.com/api/members/profile";
 
-    <script src="script.js"></script>
-    
+        const profileForm = document.getElementById("profileForm");
+        const profileMessage = document.getElementById("profileMessage");
+        const profilePhotoInput = document.getElementById("profilePhoto");
+        const profilePhotoPreview = document.getElementById("profilePhotoPreview");
+        const editPhotoBtn = document.getElementById("editPhotoBtn");
 
-<script>
-    const profileForm = document.getElementById("profileForm");
-
-    const profileFields = {
-        name: document.getElementById("profileName"),
-        email: document.getElementById("profileEmail"),
-        phone: document.getElementById("profilePhone"),
-        address: document.getElementById("profileAddress")
-    };
-
-    const profileMessage = document.getElementById("profileMessage");
-
-     
-async function loadProfile() {
-    try {
-        const response = await fetch(
-            "https://shivaji-youth-2026-backend.onrender.com/api/members/profile",
-            {
-                method: "GET",
-                credentials: "include"
-            }
-        );
-
-        if (!response.ok) {
-            profileMessage.textContent =
-                "Could not load your profile. Please log in again.";
-            return;
-        }
-
-        const profile = await response.json();
-
-        profileFields.name.value = profile.name || "";
-        profileFields.email.value = profile.email || "";
-        profileFields.phone.value = profile.phone || "";
-        profileFields.address.value = profile.address || "";
-
-        selectedProfilePhoto = profile.profilePhoto || "";
-
-        profilePhotoPreview.src =
-            selectedProfilePhoto || "/Images/default-profile.svg";
-
-        localStorage.setItem(
-            "shivajiMemberProfile",
-            JSON.stringify({
-                name: profile.name || "",
-                email: profile.email || "",
-                phone: profile.phone || "",
-                address: profile.address || "",
-                photo: selectedProfilePhoto
-            })
-        );
-
-    } catch (error) {
-        console.error("Profile load error:", error);
-        profileMessage.textContent =
-            "Unable to connect to the server. Please try again.";
-    }
-}
-
-
-        
-    profileForm.addEventListener("submit", async function(event) {
-        event.preventDefault();
-
-        const oldProfile = JSON.parse(
-            localStorage.getItem("shivajiMemberProfile") || "{}"
-        );
-
-        const profile = {
-            name: profileFields.name.value.trim(),
-            email: profileFields.email.value.trim(),
-            phone: profileFields.phone.value.trim(),
-            address: profileFields.address.value.trim(),
-            photo: selectedProfilePhoto || oldProfile.photo || ""
+        const profileFields = {
+            name: document.getElementById("profileName"),
+            email: document.getElementById("profileEmail"),
+            phone: document.getElementById("profilePhone"),
+            address: document.getElementById("profileAddress")
         };
 
-        if (!profile.name || !profile.email || !profile.phone) {
-            profileMessage.textContent =
-                "Please enter your name, email, and phone number.";
-            return;
+        let selectedProfilePhoto = "";
+
+        // Open the file chooser when Edit Photo is clicked.
+        editPhotoBtn.addEventListener("click", function () {
+            profilePhotoInput.click();
+        });
+
+        // Preview the selected image.
+        profilePhotoInput.addEventListener("change", function () {
+            const file = profilePhotoInput.files[0];
+
+            if (!file) return;
+
+            if (!file.type.startsWith("image/")) {
+                alert("Please select a valid image file.");
+                profilePhotoInput.value = "";
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert("Please select an image smaller than 5 MB.");
+                profilePhotoInput.value = "";
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function () {
+                selectedProfilePhoto = reader.result;
+                profilePhotoPreview.src = selectedProfilePhoto;
+            };
+
+            reader.onerror = function () {
+                alert("Unable to read this image. Please try another image.");
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        // Load the member profile from the backend.
+        async function loadProfile() {
+            try {
+                const response = await fetch(API_URL, {
+                    method: "GET",
+                    credentials: "include"
+                });
+
+                if (!response.ok) {
+                    profileMessage.textContent =
+                        "Could not load your profile. Please log in again.";
+                    return;
+                }
+
+                const profile = await response.json();
+
+                profileFields.name.value = profile.name || "";
+                profileFields.email.value = profile.email || "";
+                profileFields.phone.value = profile.phone || "";
+                profileFields.address.value = profile.address || "";
+
+                selectedProfilePhoto = profile.profilePhoto || "";
+
+                profilePhotoPreview.src =
+                    selectedProfilePhoto || "/Images/default-profile.svg";
+
+                localStorage.setItem(
+                    "shivajiMemberProfile",
+                    JSON.stringify({
+                        name: profile.name || "",
+                        email: profile.email || "",
+                        phone: profile.phone || "",
+                        address: profile.address || "",
+                        photo: selectedProfilePhoto
+                    })
+                );
+
+            } catch (error) {
+                console.error("Profile load error:", error);
+                profileMessage.textContent =
+                    "Unable to connect to the server. Please try again.";
+            }
         }
 
-        profileMessage.textContent = "Saving profile to the server...";
+        // Save the updated profile.
+        profileForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
 
-        try {
-            const response = await fetch(
-                "https://shivaji-youth-2026-backend.onrender.com/api/members/profile",
-                {
+            const oldProfile = JSON.parse(
+                localStorage.getItem("shivajiMemberProfile") || "{}"
+            );
+
+            const profile = {
+                name: profileFields.name.value.trim(),
+                email: profileFields.email.value.trim(),
+                phone: profileFields.phone.value.trim(),
+                address: profileFields.address.value.trim(),
+                photo: selectedProfilePhoto || oldProfile.photo || ""
+            };
+
+            if (!profile.name || !profile.email || !profile.phone) {
+                profileMessage.textContent =
+                    "Please enter your name, email, and phone number.";
+                return;
+            }
+
+            profileMessage.textContent = "Saving profile...";
+
+            try {
+                const response = await fetch(API_URL, {
                     method: "PUT",
                     credentials: "include",
                     headers: {
@@ -225,82 +289,39 @@ async function loadProfile() {
                         address: profile.address,
                         profilePhoto: profile.photo
                     })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    profileMessage.textContent =
+                        result.detail ||
+                        result.message ||
+                        "Could not save your profile.";
+                    return;
                 }
-            );
 
-            const result = await response.json();
+                localStorage.setItem(
+                    "shivajiMemberProfile",
+                    JSON.stringify(profile)
+                );
 
-            if (!response.ok) {
+                localStorage.setItem("memberName", profile.name);
+                localStorage.setItem("memberEmail", profile.email);
+                localStorage.setItem("memberPhone", profile.phone);
+
                 profileMessage.textContent =
-                    result.detail || result.message ||
-                    "Could not save the profile. Please log in again if needed.";
-                return;
+                    result.message || "Profile updated successfully!";
+
+            } catch (error) {
+                console.error("Profile save error:", error);
+                profileMessage.textContent =
+                    "Unable to save your profile. Please try again.";
             }
+        });
 
-            localStorage.setItem(
-                "shivajiMemberProfile",
-                JSON.stringify(profile)
-            );
-
-            localStorage.setItem("memberName", profile.name);
-            localStorage.setItem("memberEmail", profile.email);
-            localStorage.setItem("memberPhone", profile.phone);
-
-            profileMessage.textContent =
-                result.message || "Profile saved successfully!";
-
-        } catch (error) {
-            console.error("Profile save error:", error);
-            profileMessage.textContent =
-                "Cannot connect to the backend. Check that it is running.";
-        }
-    });
-
-         
-            
-        
-    const profilePhotoInput = document.getElementById("profilePhoto");
-    const profilePhotoPreview = document.getElementById("profilePhotoPreview");
-
-document.getElementById("editPhotoBtn").addEventListener("click", function () {
-    profilePhotoInput.click();
-});
-
-
-    let selectedProfilePhoto = "";
-
-    profilePhotoInput.addEventListener("change", function () {
-        const file = profilePhotoInput.files[0];
-
-        if (!file) return;
-
-        if (!file.type.startsWith("image/")) {
-            alert("Please select an image file.");
-            profilePhotoInput.value = "";
-            return;
-        }
-
-        if (file.size > 5 * 1024 * 1024) {
-            alert("Please select an image smaller than 5 MB.");
-            profilePhotoInput.value = "";
-            return;
-        }
-
-        const reader = new FileReader();
-
-        reader.onload = function () {
-            selectedProfilePhoto = reader.result;
-            profilePhotoPreview.src = selectedProfilePhoto;
-        };
-
-        reader.readAsDataURL(file);
-    });
-
-
-
-    loadProfile();
-</script>
-
+        loadProfile();
+    </script>
 
 </body>
 </html>
