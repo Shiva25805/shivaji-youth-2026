@@ -1721,18 +1721,20 @@ body.dashboard-body .dashboard-panel th {
     font-weight: 600;
 }
 
-#eventForm .event-form-field input,
-#eventForm .event-form-field select,
-#eventForm .event-form-field textarea {
+
+.event-form input,
+.event-form select,
+.event-form textarea {
     width: 100%;
-    max-width: 100%;
-    min-width: 0;
     box-sizing: border-box;
+    padding: 12px 14px;
+    font-size: 15px;
+    border-radius: 6px;
 }
 
-#eventForm .event-form-actions {
-    display: flex;
-    align-items: end;
+.event-form textarea {
+    min-height: 100px;
+    resize: vertical;
 }
 
 #eventForm .event-form-actions button {
@@ -2019,10 +2021,11 @@ body.dashboard-body .dashboard-panel th {
 
 /* Report Filters - Vertical Layout */
 
+
 .report-filter-form {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 15px;
 }
 
@@ -2031,23 +2034,29 @@ body.dashboard-body .dashboard-panel th {
     margin-bottom: 8px;
 }
 
-.report-filter-form input {
+.report-filter-form input,
+.report-filter-form select {
     display: block;
-    width: 70%;
+    width: 100%;
     max-width: 650px;
-    padding: 12px;
+    padding: 12px 14px;
+    font-size: 15px;
     box-sizing: border-box;
+    border-radius: 6px;
 }
 
 .report-filter-form button {
+    align-self: flex-start;
     margin-top: 5px;
 }
 
 @media (max-width: 600px) {
-    .report-filter-form input {
-        width: 100%;
+    .report-filter-form input,
+    .report-filter-form select {
+        max-width: 100%;
     }
 }
+
 
 
 /* Member profile: vertical layout */
@@ -3035,5 +3044,12 @@ body.dashboard-body .summary-card h2#balanceTotal {
 /* Move the Cancel button down */
 .cancel-btn {
     margin-top: 15px;
+}
+
+#profilePhotoPreview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
