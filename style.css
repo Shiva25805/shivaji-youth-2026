@@ -3053,3 +3053,65 @@ body.dashboard-body .summary-card h2#balanceTotal {
     object-fit: cover;
 }
 
+#eventForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#eventForm label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#eventForm input,
+#eventForm select,
+#eventForm textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#eventForm button {
+    width: 100%;
+}
+
+
+/* Force Create New Event form into a vertical layout */
+#eventForm.event-form-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px;
+    width: 100%;
+}
+
+#eventForm .event-form-field {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+}
+
+#eventForm .event-form-field label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+#eventForm .event-form-field input,
+#eventForm .event-form-field select,
+#eventForm .event-form-field textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#eventForm .event-form-actions {
+    display: flex;
+    width: 100%;
+}
+
+#eventForm .event-form-actions button {
+    width: 100%;
+}
+
+
